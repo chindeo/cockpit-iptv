@@ -2,130 +2,196 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/jsx-no-duplicate-props */
 /* eslint-disable react/jsx-handler-names */
-// /*
-//  * This file is part of Cockpit.
-//  *
-//  * Copyright (C) 2017 Red Hat, Inc.
-//  *
-//  * Cockpit is free software; you can redistribute it and/or modify it
-//  * under the terms of the GNU Lesser General Public License as published by
-//  * the Free Software Foundation; either version 2.1 of the License, or
-//  * (at your option) any later version.
-//  *
-//  * Cockpit is distributed in the hope that it will be useful, but
-//  * WITHOUT ANY WARRANTY; without even the implied warranty of
-//  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//  * Lesser General Public License for more details.
-//  *
-//  * You should have received a copy of the GNU Lesser General Public License
-//  * along with Cockpit; If not, see <http://www.gnu.org/licenses/>.
-//  */
 
-// import cockpit from "cockpit";
-// import React from "react";
-// import { Bullseye } from "@patternfly/react-core";
-
-// import { Table, TableHeader, TableBody } from '@patternfly/react-table';
-
-// const _ = cockpit.gettext;
-
-// export class Application extends React.Component {
-//     constructor() {
-//         super();
-//         this.state = { hostname: _("Unknown") };
-
-//         cockpit.file("/etc/hostname").watch((content) => {
-//             this.setState({ hostname: content.trim() });
-//         });
-//         this.state = {
-//             columns: [
-//                 { title: 'Repositories', props: null },
-//                 'Branches',
-//                 { title: 'Pull requests', props: null },
-//                 'Workspaces',
-//                 'Last Commit'
-//             ],
-//             rows: [['one', 'two', 'three', 'four', 'five']]
-//         };
-//     }
-
-//     render() {
-//         const { columns, rows } = this.state;
-//         return (
-//             <Bullseye>
-//                 <div>
-//                     <Table caption="IPTV数据服务" rows={rows} cells={columns}>
-//                         <TableHeader />
-//                         <TableBody />
-//                     </Table>
-//                 </div>
-//             </Bullseye>
-//         );
-//     }
-// }
-
-import cockpit from "cockpit";
 import React from 'react';
-import {
-    Bullseye,
-    Card,
-    Gallery,
-    Page,
-    PageSection,
-    SkipToContent,
-} from '@patternfly/react-core';
-import { Table, TableHeader, TableBody } from '@patternfly/react-table';
-
-const _ = cockpit.gettext;
+import { Button, DropdownToggle, Card, CardBody, CardTitle, CardFooter, Page, PageSection, Pagination, Split, SplitItem } from '@patternfly/react-core';
+import { TableComposable, TableText, Thead, Tr, Th, Tbody, Td, ActionsColumn } from '@patternfly/react-table';
 
 export class Application extends React.Component {
-    constructor() {
-        super();
-        this.state = { hostname: _("Unknown") };
-
-        cockpit.file("/etc/hostname").watch((content) => {
-            this.setState({ hostname: content.trim() });
-        });
+    constructor(props) {
+        super(props);
         this.state = {
-            columns: [
-                { title: 'Repositories', props: null },
-                'Branches',
-                { title: 'Pull requests', props: null },
-                'Workspaces',
-                'Last Commit'
-            ],
-            rows: [['one', 'two', 'three', 'four', 'five']]
+            page: 1,
+            perPage: 10,
+            totalItemCount: 10
         };
     }
 
-    render() {
-        const { columns, rows } = this.state;
+    renderPagination() {
+        const { page, perPage, totalItemCount } = this.state;
 
-        const pageId = 'main-content-card-view-default-nav';
-        const PageSkipToContent = <SkipToContent href={`#${pageId}`}>Skip to Content</SkipToContent>;
+        const defaultPerPageOptions = [
+            {
+                title: '1',
+                value: 1
+            },
+            {
+                title: '5',
+                value: 5
+            },
+            {
+                title: '10',
+                value: 10
+            }
+        ];
 
         return (
-            <>
-                <Page
-          skipToContent={PageSkipToContent}
-          mainContainerId={pageId}
-                >
-                    <PageSection isFilled>
-                        <Gallery hasGutter>
-                            <Card isHoverable isCompact>
-                                <Bullseye>
-                                    <div>
-                                        <Table caption="IPTV数据服务" rows={rows} cells={columns}>
-                                            <TableHeader />
-                                            <TableBody />
-                                        </Table>
-                                    </div>
-                                </Bullseye>
-                            </Card>
-                        </Gallery>
-                    </PageSection>
-                </Page>
-            </>
+            <Pagination
+        itemCount={totalItemCount}
+        page={page}
+        perPage={perPage}
+        perPageOptions={defaultPerPageOptions}
+        onSetPage={(_evt, value) => {
+            this.fetch(value, perPage);
+        }}
+        onPerPageSelect={(_evt, value) => {
+            this.fetch(1, value);
+        }}
+        variant="top"
+        isCompact
+            />
+        );
+    }
+
+    render() {
+        const repositories = [{
+            name: 'one',
+            branches: 'two',
+            prs: 'a',
+            workspaces: 'four',
+            lastCommit: 'five',
+            singleAction: '启动'
+        }, {
+            name: 'a',
+            branches: 'two',
+            prs: 'k',
+            workspaces: 'four',
+            lastCommit: 'five',
+            singleAction: '启动'
+        }, {
+            name: 'p',
+            branches: 'two',
+            prs: 'b',
+            workspaces: 'four',
+            lastCommit: 'five',
+            singleAction: '启动'
+        }, {
+            name: '4',
+            branches: '2',
+            prs: 'b',
+            workspaces: 'four',
+            lastCommit: 'five',
+            singleAction: '启动'
+        }, {
+            name: '5',
+            branches: '2',
+            prs: 'b',
+            workspaces: 'four',
+            lastCommit: 'five',
+            singleAction: '启动'
+        }];
+        const columnNames = {
+            name: 'Repositories',
+            branches: 'Branches',
+            prs: 'Pull requests',
+            workspaces: 'Workspaces',
+            lastCommit: 'Last commit',
+            singleAction: 'Single action'
+        };
+        const customActionsToggle = props =>
+            <DropdownToggle onToggle={props.onToggle} isDisabled={props.isDisabled}>
+                操作
+            </DropdownToggle>;
+        const defaultActions = repo => [{
+            title: '停止',
+            onClick: () => console.log(`clicked on Some action, on row ${repo.name}`)
+        }, {
+            title: <a href="https://www.patternfly.org">删除</a>
+        }, {
+            isSeparator: true
+        }, {
+            title: '编辑',
+            onClick: () => console.log(`clicked on Third action, on row ${repo.name}`)
+        }];
+        const lastRowActions = repo => [{
+            title: '停止',
+            onClick: () => console.log(`clicked on Some action, on row ${repo.name}`)
+        }, {
+            title: <div>删除</div>,
+            onClick: () => console.log(`clicked on Another action, on row ${repo.name}`)
+        }, {
+            isSeparator: true
+        }, {
+            title: '编辑',
+            onClick: () => console.log(`clicked on Third action, on row ${repo.name}`)
+        }];
+
+        return (
+            <Card>
+                <CardTitle>
+                    <Split>
+                        <SplitItem isFilled>IPTV数据服务</SplitItem>
+                        <SplitItem>
+                            <Button variant="primary">添  加</Button>
+                        </SplitItem>
+                    </Split>
+                </CardTitle>
+                <CardBody>
+                    <Page>
+                        <PageSection>
+                            <TableComposable aria-label="Actions table">
+                                <Thead>
+                                    <Tr>
+                                        <Th>{columnNames.name}</Th>
+                                        <Th>{columnNames.branches}</Th>
+                                        <Th>{columnNames.prs}</Th>
+                                        <Th>{columnNames.workspaces}</Th>
+                                        <Th>{columnNames.lastCommit}</Th>
+                                        <Td />
+                                        <Td />
+                                    </Tr>
+                                </Thead>
+                                <Tbody>
+                                    {repositories.map(repo => {
+                                        let rowActions = defaultActions(repo);
+                                        if (repo.name === 'a') {
+                                            rowActions = null;
+                                        }
+                                        if (repo.name === '5') {
+                                            rowActions = lastRowActions(repo);
+                                        }
+                                        let singleActionButton = null;
+                                        if (repo.singleAction !== '') {
+                                            singleActionButton = (
+                                                <TableText>
+                                                    <Button variant="secondary">{repo.singleAction}</Button>
+                                                </TableText>
+                                            );
+                                        }
+                                        return (
+                                            <Tr key={repo.name}>
+                                                <Td dataLabel={columnNames.name}>{repo.name}</Td>
+                                                <Td dataLabel={columnNames.branches}>{repo.branches}</Td>
+                                                <Td dataLabel={columnNames.prs}>{repo.prs}</Td>
+                                                <Td dataLabel={columnNames.workspaces}>{repo.workspaces}</Td>
+                                                <Td dataLabel={columnNames.lastCommit}>{repo.lastCommit}</Td>
+                                                <Td dataLabel={columnNames.singleAction} modifier="fitContent">
+                                                    {singleActionButton}
+                                                </Td>
+                                                <Td isActionCell>
+                                                    {rowActions ? <ActionsColumn items={rowActions} isDisabled={repo.name === '4'} actionsToggle={customActionsToggle} /> : null}
+                                                </Td>
+                                            </Tr>
+                                        );
+                                    })}
+                                </Tbody>
+                            </TableComposable>
+                        </PageSection>
+                    </Page>
+                </CardBody>
+                <CardFooter>{this.renderPagination()}</CardFooter>
+            </Card>
+
         );
     }
 }
