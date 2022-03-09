@@ -23,6 +23,7 @@ import '@patternfly/react-core/dist/styles/base.css';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Application } from './app.jsx';
+
 /*
  * PF4 overrides need to come after the JSX components imports because
  * these are importing CSS stylesheets that we are overriding

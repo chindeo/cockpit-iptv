@@ -90,7 +90,7 @@ module.exports = {
             {
                 exclude: /node_modules/,
                 use: "babel-loader",
-                test: /\.(js|jsx)$/,
+                test: /\.(js|jsx)$/
             },
             /* HACK: remove unwanted fonts from PatternFly's css */
             {
