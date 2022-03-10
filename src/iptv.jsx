@@ -43,7 +43,7 @@ import {
 } from '@patternfly/react-table'
 import { format } from 'date-fns'
 import { ModalError } from 'cockpit-components-inline-notification.jsx'
-import { device_state_text, is_managed, render_active_connection } from './interfaces.js'
+
 
 const _ = cockpit.gettext
 
@@ -59,81 +59,6 @@ const http = cockpit.http({
 export class Application extends React.Component {
     constructor(props) {
         super(props)
-
-        const managed = []
-        const unmanaged = []
-        const plot_ifaces = []
-
-        props.interfaces.forEach((iface) => {
-            function hasGroup(iface) {
-                return (
-                    (iface.Device &&
-                    iface.Device.ActiveConnection &&
-                    iface.Device.ActiveConnection.Group &&
-                    iface.Device.ActiveConnection.Group.Members.length > 0) ||
-                (iface.MainConnection && iface.MainConnection.Groups.length > 0)
-                )
-            }
-
-            // Skip loopback
-            if (iface.Device && iface.Device.DeviceType === 'loopback') return
-
-            // Skip members
-            if (hasGroup(iface)) return
-
-            const dev = iface.Device
-            const show_traffic = dev && (dev.State === 100 || dev.State === 10) && dev.Carrier === true
-
-            plot_ifaces.push(iface.Name)
-            // usage_monitor.add(iface.Name)
-
-            const activeConnection = render_active_connection(dev, false, true)
-            const row = {
-                columns: [
-                    {
-                        title:
-                        !dev || is_managed(dev) ? (
-                            <Button
-                                variant='link'
-                                isInline
-                                onClick={() => cockpit.location.go([iface.Name])}
-                            >
-                                {iface.Name}
-                            </Button>
-                        ) : (
-                            iface.Name
-                        )
-                    },
-                    { title: activeConnection }
-                ],
-                props: {
-                    key: iface.Name,
-                    'data-interface': encodeURIComponent(iface.Name),
-                    'data-sample-id': show_traffic ? encodeURIComponent(iface.Name) : null,
-                    'data-row-id': iface.Name
-                }
-            }
-
-            if (show_traffic) {
-                // const samples = usage_monitor.samples[iface.Name]
-                // row.columns.push({
-                //     title: samples ? cockpit.format_bits_per_sec(samples[1][0] * 8) : ''
-                // })
-                // row.columns.push({
-                //     title: samples ? cockpit.format_bits_per_sec(samples[0][0] * 8) : ''
-                // })
-            } else {
-                row.columns.push({ title: device_state_text(dev), props: { colSpan: 2 } })
-            }
-
-            if (!dev || is_managed(dev)) {
-                managed.push(row)
-            } else {
-                unmanaged.push(row)
-            }
-        })
-
-        console.log(props.interfaces)
     
         this.state = {
             repo:null,
@@ -312,6 +237,7 @@ export class Application extends React.Component {
             startAt: '启动时间',
             status: '任务状态',
             transType: '输出类型',
+            eth: '网口',
             url: '输出地址'
         }
 
@@ -357,6 +283,7 @@ export class Application extends React.Component {
                                     <Th width={15}>{columnNames.url}</Th>
                                     <Th>{columnNames.transType}</Th>
                                     <Th>{columnNames.status}</Th>
+                                    <Th>{columnNames.eth}</Th>
                                     <Th>{columnNames.startAt}</Th>
                                     <Td />
                                     <Td />
@@ -401,6 +328,9 @@ export class Application extends React.Component {
                                                 >
                                                     {repo.statusText}
                                                 </Label>
+                                            </Td>
+                                            <Td textCenter dataLabel={columnNames.eth}>
+                                                {repo.eth}
                                             </Td>
                                             <Td
                                                   dataLabel={columnNames.startAt}
@@ -460,7 +390,7 @@ export class Application extends React.Component {
                     </CardBody>
                     <CardFooter>{this.renderPagination()}</CardFooter>
                     {this.state.showActivateTaskModal && (
-                        <ActivateZoneModal http={http} type={this.state.showActivateTaskModalType} repo={this.state.repo}  addAlert={this.addAlert} tasklist={this.tasklist} close={this.close} />
+                        <ActivateZoneModal http={http} type={this.state.showActivateTaskModalType} interfaces={this.props.interfaces} repo={this.state.repo}  addAlert={this.addAlert} tasklist={this.tasklist} close={this.close} />
                     )}
                 </Card>
             </>
@@ -481,7 +411,7 @@ class ActivateZoneModal extends React.Component {
                 transType: '',
                 eth: '',
 
-                interfaces: new Set(),
+                parentChoices: props.interfaces,
 
                 dialogError: null,
                 dialogErrorDetail: null,
@@ -496,7 +426,7 @@ class ActivateZoneModal extends React.Component {
                 transType:  props.repo.transType,
                 eth:  props.repo.eth,
 
-                interfaces: new Set(),
+                parentChoices: props.interfaces,
 
                 dialogError: null,
                 dialogErrorDetail: null,
@@ -662,6 +592,27 @@ class ActivateZoneModal extends React.Component {
                                     value={this.state.roomName}
                                     onChange={(value) => this.onChange('roomName', value)}
                         />
+                    </FormGroup>
+                    <FormGroup label={_('网口')} isRequired>
+                        <Flex direction={{ default: 'column' }}>
+                            <FlexItem className='add-zone-zones-custom'>
+                                <FormSelect
+                                    isRequired
+                                    value={this.state.eth}
+                                    onChange={(value, e) => this.onChange('eth', value)}
+                                    aria-label='FormSelect Input'
+                                >
+                                    {this.state.parentChoices.map((option, index) => (
+                                        <FormSelectOption
+                                            isDisabled={option.disabled}
+                                            key={index}
+                                            value={option.Name}
+                                            label={option.Name}
+                                        />
+                                    ))}
+                                </FormSelect>
+                            </FlexItem>
+                        </Flex>
                     </FormGroup>
                 </Form>
             </Modal>
