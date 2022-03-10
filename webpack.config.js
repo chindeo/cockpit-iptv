@@ -1,39 +1,37 @@
 /* eslint-disable new-cap */
-const fs = require("fs");
-const path = require("path");
+const fs = require('fs')
+const path = require('path')
 
-const copy = require("copy-webpack-plugin");
-const extract = require("mini-css-extract-plugin");
-const TerserJSPlugin = require("terser-webpack-plugin");
-const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
-const CompressionPlugin = require("compression-webpack-plugin");
-const ESLintPlugin = require("eslint-webpack-plugin");
-const CockpitPoPlugin = require("./src/lib/cockpit-po-plugin");
-const CockpitRsyncPlugin = require("./src/lib/cockpit-rsync-plugin");
+const copy = require('copy-webpack-plugin')
+const extract = require('mini-css-extract-plugin')
+const TerserJSPlugin = require('terser-webpack-plugin')
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin')
+const CompressionPlugin = require('compression-webpack-plugin')
+const ESLintPlugin = require('eslint-webpack-plugin')
+const CockpitPoPlugin = require('./src/lib/cockpit-po-plugin')
+const CockpitRsyncPlugin = require('./src/lib/cockpit-rsync-plugin')
 
 /* A standard nodejs and webpack pattern */
-const production = process.env.NODE_ENV === "production";
+const production = process.env.NODE_ENV === 'production'
 
 /* development options for faster iteration */
-const eslint = process.env.ESLINT !== "0";
+const eslint = process.env.ESLINT !== '0'
 
 // Obtain package name from package.json
-const packageJson = JSON.parse(fs.readFileSync("package.json"));
+const packageJson = JSON.parse(fs.readFileSync('package.json'))
 
 // Non-JS files which are copied verbatim to dist/
-const copy_files = ["./src/index.html", "./src/manifest.json"];
+const copy_files = ['./src/index.html', './src/manifest.json']
 
 const plugins = [
     new copy({ patterns: copy_files }),
-    new extract({ filename: "[name].css" }),
+    new extract({ filename: '[name].css' }),
     new CockpitPoPlugin(),
-    new CockpitRsyncPlugin({ dest: packageJson.name }),
-];
+    new CockpitRsyncPlugin({ dest: packageJson.name })
+]
 
 if (eslint) {
-    plugins.push(
-        new ESLintPlugin({ extensions: ["js", "jsx"], failOnWarning: true })
-    );
+    plugins.push(new ESLintPlugin({ extensions: ['js', 'jsx'], failOnWarning: true }))
 }
 
 /* Only minimize when in production mode */
@@ -41,33 +39,33 @@ if (production) {
     plugins.unshift(
         new CompressionPlugin({
             test: /\.(js|html|css)$/,
-            deleteOriginalAssets: true,
+            deleteOriginalAssets: true
         })
-    );
+    )
 }
 
 module.exports = {
-    output:{
-        path:path.resolve(__dirname, '../starter-kit'),
+    output: {
+        path: path.resolve(__dirname, '../starter-kit')
     },
-    mode: production ? "production" : "development",
+    mode: production ? 'production' : 'development',
     resolve: {
-        modules: ["node_modules", path.resolve(__dirname, "src/lib")],
-        alias: { "font-awesome": "font-awesome-sass/assets/stylesheets" },
+        modules: ['node_modules', path.resolve(__dirname, 'src/lib')],
+        alias: { 'font-awesome': 'font-awesome-sass/assets/stylesheets' }
     },
     resolveLoader: {
-        modules: ["node_modules", path.resolve(__dirname, "src/lib")],
+        modules: ['node_modules', path.resolve(__dirname, 'src/lib')]
     },
     watchOptions: {
-        ignored: /node_modules/,
+        ignored: /node_modules/
     },
     entry: {
-        index: "./src/index.js",
+        index: './src/app.jsx'
     },
     // cockpit.js gets included via <script>, everything else should be bundled
-    externals: { cockpit: "cockpit" },
-    devtool: "source-map",
-    stats: "errors-warnings",
+    externals: { cockpit: 'cockpit' },
+    devtool: 'source-map',
+    stats: 'errors-warnings',
 
     optimization: {
         minimize: production,
@@ -77,19 +75,19 @@ module.exports = {
                     condition: true,
                     filename: `[file].LICENSE.txt?query=[query]&filebase=[base]`,
                     banner(licenseFile) {
-                        return `License information can be found in ${licenseFile}`;
-                    },
-                },
+                        return `License information can be found in ${licenseFile}`
+                    }
+                }
             }),
-            new CssMinimizerPlugin(),
-        ],
+            new CssMinimizerPlugin()
+        ]
     },
 
     module: {
         rules: [
             {
                 exclude: /node_modules/,
-                use: "babel-loader",
+                use: 'babel-loader',
                 test: /\.(js|jsx)$/
             },
             /* HACK: remove unwanted fonts from PatternFly's css */
@@ -98,38 +96,38 @@ module.exports = {
                 use: [
                     extract.loader,
                     {
-                        loader: "css-loader",
+                        loader: 'css-loader',
                         options: {
                             sourceMap: true,
-                            url: false,
-                        },
+                            url: false
+                        }
                     },
                     {
-                        loader: "string-replace-loader",
+                        loader: 'string-replace-loader',
                         options: {
                             multiple: [
                                 {
                                     search: /src:url\("patternfly-icons-fake-path\/pficon[^}]*/g,
                                     replace:
-                    'src:url("../base1/fonts/patternfly.woff") format("woff");',
+                                        'src:url("../base1/fonts/patternfly.woff") format("woff");'
                                 },
                                 {
                                     search: /@font-face[^}]*patternfly-fonts-fake-path[^}]*}/g,
-                                    replace: "",
-                                },
-                            ],
-                        },
+                                    replace: ''
+                                }
+                            ]
+                        }
                     },
                     {
-                        loader: "sass-loader",
+                        loader: 'sass-loader',
                         options: {
                             sourceMap: !production,
                             sassOptions: {
-                                outputStyle: production ? "compressed" : undefined,
-                            },
-                        },
-                    },
-                ],
+                                outputStyle: production ? 'compressed' : undefined
+                            }
+                        }
+                    }
+                ]
             },
             {
                 test: /\.s?css$/,
@@ -137,32 +135,32 @@ module.exports = {
                 use: [
                     extract.loader,
                     {
-                        loader: "css-loader",
+                        loader: 'css-loader',
                         options: {
                             sourceMap: true,
-                            url: false,
-                        },
+                            url: false
+                        }
                     },
                     {
-                        loader: "sass-loader",
+                        loader: 'sass-loader',
                         options: {
                             sourceMap: !production,
                             sassOptions: {
-                                outputStyle: production ? "compressed" : undefined,
-                            },
-                        },
-                    },
-                ],
+                                outputStyle: production ? 'compressed' : undefined
+                            }
+                        }
+                    }
+                ]
             },
             {
                 test: /\.(png|jpe?g|gif|svg)$/i,
                 use: [
                     {
-                        loader: 'file-loader',
-                    },
-                ],
-            },
-        ],
+                        loader: 'file-loader'
+                    }
+                ]
+            }
+        ]
     },
-    plugins: plugins,
-};
+    plugins: plugins
+}

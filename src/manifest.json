@@ -1,12 +1,12 @@
 {
   "version": "v1",
-  "main": "index.html",
   "requires": {
-    "cockpit": "137"
+    "cockpit": "187"
   },
   "tools": {
     "index": {
-      "label": "IPTV数据服务"
+      "label": "IPTV数据服务",
+      "path": "index.html"
     }
   }
 }
