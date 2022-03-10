@@ -23,7 +23,6 @@ import {
     FlexItem,
     Form,
     FormGroup,
-    FormHelperText,
     Modal,
     TextInput,
     ClipboardCopy,
@@ -206,8 +205,8 @@ export class Application extends React.Component {
                     this.addAlert('success', '操作成功')
                 })
             } else {
-                request.then((data) => {
-                    this.addAlert('danger', '操作失败', data)
+                request.catch((data) => {
+                    this.addAlert('danger', '操作失败',  data.message)
                 })
             }
         })
@@ -222,8 +221,8 @@ export class Application extends React.Component {
                     this.addAlert('success', '操作成功')
                 })
             } else {
-                request.then((data) => {
-                    this.addAlert('danger', '操作失败', data)
+                request.catch((data) => {
+                    this.addAlert('danger', '操作失败', data.message)
                 })
             }
         })
@@ -238,8 +237,8 @@ export class Application extends React.Component {
                     this.addAlert('success', '操作成功')
                 })
             } else {
-                request.then((data) => {
-                    this.addAlert('danger', '操作失败', data)
+                request.catch((data) => {
+                    this.addAlert('danger', '操作失败',  data.message)
                 })
             }
         })
@@ -327,9 +326,6 @@ export class Application extends React.Component {
                 title: '编辑',
                 onClick: this.openEditTaskDialog.bind(this,repo)
             },
-            // {
-            //     isSeparator: true
-            // },
             {
                 title: '删除',
                 onClick: this.delTask.bind(this, repo.id)
@@ -337,7 +333,7 @@ export class Application extends React.Component {
         ]
 
         return (
-            <Page>
+            <>
                 <AlertGroup isLiveRegion>{this.state.alerts}</AlertGroup>
                 <Card >
                     <CardTitle>
@@ -351,127 +347,123 @@ export class Application extends React.Component {
                         </Split>
                     </CardTitle>
                     <CardBody>
-                        <Page>
-                            <PageSection padding={{ default: 'noPadding', md: 'padding', lg: 'padding' }}>
-                                <TableComposable aria-label='Actions table'>
-                                    <Thead>
-                                        <Tr>
-                                            <Th width={2}>{columnNames.id}</Th>
-                                            <Th width={5}>{columnNames.name}</Th>
-                                            <Th width={5}>{columnNames.roomName}</Th>
-                                            <Th width={20}>{columnNames.source}</Th>
-                                            <Th width={15}>{columnNames.url}</Th>
-                                            <Th>{columnNames.transType}</Th>
-                                            <Th>{columnNames.status}</Th>
-                                            <Th>{columnNames.startAt}</Th>
-                                            <Td />
-                                            <Td />
-                                        </Tr>
-                                    </Thead>
-                                    <Tbody>
-                                        {this.state.repositories.map((repo) => {
-                                            const rowActions = defaultActions(repo)
-                                            return (
-                                                <Tr key={repo.roomName}>
-                                                    <Td dataLabel={columnNames.id}>{repo.id}</Td>
-                                                    <Td dataLabel={columnNames.name}>
-                                                        {repo.name}
-                                                    </Td>
-                                                    <Td dataLabel={columnNames.roomName}>
-                                                        {repo.roomName}
-                                                    </Td>
-                                                    <Td
+                        <TableComposable aria-label='Actions table'>
+                            <Thead>
+                                <Tr>
+                                    <Th width={2}>{columnNames.id}</Th>
+                                    <Th width={5}>{columnNames.name}</Th>
+                                    <Th width={5}>{columnNames.roomName}</Th>
+                                    <Th width={20}>{columnNames.source}</Th>
+                                    <Th width={15}>{columnNames.url}</Th>
+                                    <Th>{columnNames.transType}</Th>
+                                    <Th>{columnNames.status}</Th>
+                                    <Th>{columnNames.startAt}</Th>
+                                    <Td />
+                                    <Td />
+                                </Tr>
+                            </Thead>
+                            <Tbody>
+                                {this.state.repositories.map((repo) => {
+                                    const rowActions = defaultActions(repo)
+                                    return (
+                                        <Tr key={repo.roomName}>
+                                            <Td dataLabel={columnNames.id}>{repo.id}</Td>
+                                            <Td dataLabel={columnNames.name}>
+                                                {repo.name}
+                                            </Td>
+                                            <Td dataLabel={columnNames.roomName}>
+                                                {repo.roomName}
+                                            </Td>
+                                            <Td
                                                   dataLabel={columnNames.source}
                                                   modifier='breakWord'
-                                                    >
-                                                        <ClipboardCopy hoverTip="Copy" clickTip="Copied" variant={ClipboardCopyVariant.expansion} >{repo.source}
-                                                        </ClipboardCopy>
-                                                    </Td>
-                                                    <Td
+                                            >
+                                                <ClipboardCopy hoverTip="Copy" clickTip="Copied" variant={ClipboardCopyVariant.expansion} >{repo.source}
+                                                </ClipboardCopy>
+                                            </Td>
+                                            <Td
                                                   dataLabel={columnNames.url}
                                                   modifier='breakWord'
-                                                    >
-                                                        <ClipboardCopy hoverTip="Copy" clickTip="Copied" variant={ClipboardCopyVariant.expansion} >{repo.url}
-                                                        </ClipboardCopy>
-                                                    </Td>
-                                                    <Td textCenter dataLabel={columnNames.transType}>
-                                                        {repo.transType}
-                                                    </Td>
-                                                    <Td dataLabel={columnNames.status}>
-                                                        <Label
+                                            >
+                                                <ClipboardCopy hoverTip="Copy" clickTip="Copied" variant={ClipboardCopyVariant.expansion} >{repo.url}
+                                                </ClipboardCopy>
+                                            </Td>
+                                            <Td textCenter dataLabel={columnNames.transType}>
+                                                {repo.transType}
+                                            </Td>
+                                            <Td dataLabel={columnNames.status}>
+                                                <Label
                                                       color={
                                                           repo.status
                                                               ? 'green'
                                                               : ''
                                                       }
-                                                        >
-                                                            {repo.statusText}
-                                                        </Label>
-                                                    </Td>
-                                                    <Td
+                                                >
+                                                    {repo.statusText}
+                                                </Label>
+                                            </Td>
+                                            <Td
                                                   dataLabel={columnNames.startAt}
                                                   modifier='breakWord'
-                                                    >
-                                                        {repo.startAt !== '-'
-                                                            ? format(
-                                                                new Date(repo.startAt),
-                                                                'yyyy-MM-dd H:m:s'
-                                                            )
-                                                            : repo.startAt}
-                                                    </Td>
-                                                    <Td
+                                            >
+                                                {repo.startAt !== '-'
+                                                    ? format(
+                                                        new Date(repo.startAt),
+                                                        'yyyy-MM-dd H:m:s'
+                                                    )
+                                                    : repo.startAt}
+                                            </Td>
+                                            <Td
                                                   dataLabel={columnNames.singleAction}
                                                   modifier='fitContent'
-                                                    >
-                                                        <TableText>
-                                                            {repo.status ? (
-                                                                <Button
+                                            >
+                                                <TableText>
+                                                    {repo.status ? (
+                                                        <Button
                                                               variant='danger'
                                                               onClick={this.stopTask.bind(
                                                                   this,
                                                                   repo.id
                                                               )}
-                                                                >
-                                                                    停止
-                                                                </Button>
-                                                            ) : (
-                                                                <Button
+                                                        >
+                                                            停止
+                                                        </Button>
+                                                    ) : (
+                                                        <Button
                                                               variant='primary'
                                                               onClick={this.startTask.bind(
                                                                   this,
                                                                   repo.id
                                                               )}
-                                                                >
-                                                                    启动
-                                                                </Button>
-                                                            )}
-                                                        </TableText>
-                                                    </Td>
-                                                    <Td isActionCell>
-                                                        {rowActions ? (
-                                                            <ActionsColumn
+                                                        >
+                                                            启动
+                                                        </Button>
+                                                    )}
+                                                </TableText>
+                                            </Td>
+                                            <Td isActionCell>
+                                                {rowActions ? (
+                                                    <ActionsColumn
                                                           items={rowActions}
                                                           isDisabled={
                                                               repo.status
                                                           }
                                                           actionsToggle={customActionsToggle}
-                                                            />
-                                                        ) : null}
-                                                    </Td>
-                                                </Tr>
-                                            )
-                                        })}
-                                    </Tbody>
-                                </TableComposable>
-                            </PageSection>
-                        </Page>
+                                                    />
+                                                ) : null}
+                                            </Td>
+                                        </Tr>
+                                    )
+                                })}
+                            </Tbody>
+                        </TableComposable>
                     </CardBody>
                     <CardFooter>{this.renderPagination()}</CardFooter>
                     {this.state.showActivateTaskModal && (
                         <ActivateZoneModal http={http} type={this.state.showActivateTaskModalType} repo={this.state.repo}  addAlert={this.addAlert} tasklist={this.tasklist} close={this.close} />
                     )}
                 </Card>
-            </Page>
+            </>
         )
     }
 }
@@ -482,6 +474,7 @@ class ActivateZoneModal extends React.Component {
         super(props)
         if(props.type === "add"){
             this.state = {
+                id: '',
                 name: '',
                 source: '',
                 roomName: '',
@@ -496,6 +489,7 @@ class ActivateZoneModal extends React.Component {
             }
         }else if(props.type === "edit"){
             this.state = {
+                id: props.repo.id,
                 name: props.repo.name,
                 source:  props.repo.source,
                 roomName:  props.repo.roomName,
@@ -532,13 +526,18 @@ class ActivateZoneModal extends React.Component {
 
     save(event) {
         const data = {
+            id: this.state.id,
+            name: this.state.name,
             source: this.state.source,
             customPath: this.state.customPath,
             roomName: this.state.roomName,
-            transType: this.state.transType
+            transType: this.state.transType,
+            eth: this.state.eth
         }
+        console.log(data)
         const request = http.post('/api/v1/stream/add', data)
         request.response((status, headers) => {
+            console.log(status)
             if (status === 200) {
                 request.then((data) => {
                     this.props.addAlert('success', '操作成功')
@@ -546,8 +545,8 @@ class ActivateZoneModal extends React.Component {
                     this.props.close()
                 })
             } else {
-                request.then((data) => {
-                    this.props.addAlert('danger', '操作失败', data)
+                request.catch((data) => {
+                    this.props.addAlert('danger', '操作失败',  data.message)
                 })
             }
         })
@@ -642,7 +641,6 @@ class ActivateZoneModal extends React.Component {
                                     id='name'
                                     name='name'
                                     aria-describedby='推流名称'
-                                    //  validated={this.state.tcp_error ? "error" : "default"}
                                     value={this.state.name}
                                     onChange={(value) => this.onChange('name', value)}
                         />

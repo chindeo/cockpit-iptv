@@ -5,6 +5,7 @@
 import cockpit from 'cockpit'
 import ReactDOM from 'react-dom'
 import React from 'react'
+import './lib/patternfly/patternfly-4-cockpit.scss'
 
 import { ModelContext } from './model-context.jsx'
 
