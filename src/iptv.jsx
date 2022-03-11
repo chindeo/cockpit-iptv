@@ -29,7 +29,8 @@ import {
     ClipboardCopyVariant,
     FormSelect,
     FormSelectOption,
-    TextArea
+    TextArea,
+    setTabIndex
 } from '@patternfly/react-core'
 import {
     TableComposable,
@@ -119,6 +120,44 @@ export class Application extends React.Component {
             </Alert>
         )
         this.state.alerts.push(inAlert)
+    }
+
+    stopAll() {
+        if(!this.props.selectedRepoIds || this.props.selectedRepoIds.length ===0){
+            return false
+        }
+        const request = http.get('/api/v1/stream/stopAll',{ids:this.props.selectedRepoIds})
+        request.response((status, headers) => {
+            if (status === 200) {
+                this.tasklist()
+                request.then((data) => {
+                    this.addAlert('success', '操作成功')
+                })
+            } else {
+                request.catch((data) => {
+                    this.addAlert('danger', '操作失败',  data.message)
+                })
+            }
+        })
+    }
+
+    startAll() {
+        if(!this.props.selectedRepoIds || this.props.selectedRepoIds.length ===0){
+            return false
+        }
+        const request = http.get('/api/v1/stream/startAll',{ids:this.props.selectedRepoIds})
+        request.response((status, headers) => {
+            if (status === 200) {
+                this.tasklist()
+                request.then((data) => {
+                    this.addAlert('success', '操作成功')
+                })
+            } else {
+                request.catch((data) => {
+                    this.addAlert('danger', '操作失败', data.message)
+                })
+            }
+        })
     }
 
     stopTask(id) {
@@ -241,6 +280,8 @@ export class Application extends React.Component {
             url: '输出地址'
         }
 
+
+
         const customActionsToggle = (props) => (
             <DropdownToggle onToggle={props.onToggle} isDisabled={props.isDisabled}>
                 操作
@@ -258,6 +299,26 @@ export class Application extends React.Component {
             },
         ]
 
+        const isRepoSelectable = repo => repo.name !== ''
+        const selectableRepos = this.state.repositories.filter(isRepoSelectable)
+        const selectAllRepos = (isSelecting = true) => this.props.setselectedRepoIds(isSelecting ? selectableRepos.map(r => r.id) : [])
+        const areAllReposSelected = this.props.selectedRepoIds.length === selectableRepos.length
+        const isRepoSelected = repo => this.props.selectedRepoIds.includes(repo.id)
+        const setRepoSelected = (repo, isSelecting = true) => this.props.setselectedRepoIds(prevSelected => {
+            const otherSelectedRepoIds = prevSelected.filter(r => r !== repo.id)
+            return isSelecting && isRepoSelectable(repo) ? [...otherSelectedRepoIds, repo.id] : otherSelectedRepoIds
+        })
+        const onSelectRepo = (repo, rowIndex, isSelecting) => {
+            if (this.props.shifting && this.props.recentSelectedRowIndex !== null) {
+                const numberSelected = rowIndex - this.props.recentSelectedRowIndex
+                const intermediateIndexes = numberSelected > 0 ? Array.from(new Array(numberSelected + 1), (_x, i) => i + this.props.recentSelectedRowIndex) : Array.from(new Array(Math.abs(numberSelected) + 1), (_x, i) => i + rowIndex)
+                intermediateIndexes.forEach(index => setRepoSelected(this.state.repositories[index], isSelecting))
+            } else {
+                setRepoSelected(repo, isSelecting)
+            }
+            this.props.setRecentSelectedRowIndex(rowIndex)
+        }
+
         return (
             <>
                 <AlertGroup isLiveRegion>{this.state.alerts}</AlertGroup>
@@ -269,6 +330,12 @@ export class Application extends React.Component {
                                 <Button variant='primary' onClick={this.openAddTaskDialog}>
                                     添 加
                                 </Button>
+                                <Button variant='green' onClick={this.startAll}>
+                                    启 动
+                                </Button>
+                                <Button variant='danger' onClick={this.stopAll}>
+                                    停 止
+                                </Button>
                             </SplitItem>
                         </Split>
                     </CardTitle>
@@ -276,6 +343,10 @@ export class Application extends React.Component {
                         <TableComposable aria-label='Actions table'>
                             <Thead>
                                 <Tr>
+                                    <Th select={{
+                                        onSelect: (_event, isSelecting) => selectAllRepos(isSelecting),
+                                        isSelected: areAllReposSelected
+                                    }} />
                                     <Th width={2}>{columnNames.id}</Th>
                                     <Th width={5}>{columnNames.name}</Th>
                                     <Th width={5}>{columnNames.roomName}</Th>
@@ -290,10 +361,16 @@ export class Application extends React.Component {
                                 </Tr>
                             </Thead>
                             <Tbody>
-                                {this.state.repositories.map((repo) => {
+                                {this.state.repositories.map((repo,rowIndex) => {
                                     const rowActions = defaultActions(repo)
                                     return (
                                         <Tr key={repo.roomName}>
+                                            <Td select={{
+                                                rowIndex,
+                                                onSelect: (_event, isSelecting) => onSelectRepo(repo, rowIndex, isSelecting),
+                                                isSelected: isRepoSelected(repo),
+                                                disable: !isRepoSelectable(repo)
+                                            }} />
                                             <Td dataLabel={columnNames.id}>{repo.id}</Td>
                                             <Td dataLabel={columnNames.name}>
                                                 {repo.name}
@@ -415,22 +492,23 @@ class ActivateZoneModal extends React.Component {
 
                 dialogError: null,
                 dialogErrorDetail: null,
-                title:"添加任务"
+                title:"添加任务",
+                invalidText: '不能为空',
+                validated: 'default',
             }
         }else if(props.type === "edit"){
             this.state = {
-                id: props.repo.id,
-                name: props.repo.name,
-                source:  props.repo.source,
-                roomName:  props.repo.roomName,
-                transType:  props.repo.transType,
-                eth:  props.repo.eth,
-
+                id: {validated:"default",value:props.repo.id},
+                name: {validated:"default",value:props.repo.name},
+                source:  {validated:"default",value:props.repo.source},
+                roomName:  {validated:"default",value:props.repo.roomName},
+                transType:  {validated:"default",value:props.repo.transType},
+                eth:  {validated:"default",value:props.repo.eth},
                 parentChoices: props.interfaces,
 
                 dialogError: null,
                 dialogErrorDetail: null,
-                title:"编辑任务"
+                title:"编辑任务",
             }
         }
         
@@ -451,23 +529,43 @@ class ActivateZoneModal extends React.Component {
     }
 
     onChange(key, value) {
-        this.setState({ [key]: value })
+        this.setState({ [key]: {value:value,validated :"default"} })
     }
 
     save(event) {
         const data = {
-            id: this.state.id,
-            name: this.state.name,
-            source: this.state.source,
-            customPath: this.state.customPath,
-            roomName: this.state.roomName,
-            transType: this.state.transType,
-            eth: this.state.eth
+            id: this.state.id.value,
+            name: this.state.name.value,
+            source: this.state.source.value,
+            roomName: this.state.roomName.value,
+            transType: this.state.transType.value,
+            eth: this.state.eth.value
         }
-        console.log(data)
+        if(this.props.type === "edit"){
+            if(data.id==="" || data.id===undefined){
+                this.setState({ id: {validated :"error"},dialogError:"标识数据异常！！" })
+                return false
+            }
+        }
+        if(data.name==="" || data.name===undefined){
+            this.setState({ name: {validated :"error"},dialogError:"请正确输入任务名称！！" })
+            return false
+        }
+        if(data.source==="" || data.source===undefined){
+            this.setState({ source: {validated :"error"},dialogError:"请正确输入推流数据源！！" })
+            return false
+        }
+        if(data.roomName==="" || data.roomName===undefined){
+            this.setState({ roomName: {validated :"error"},dialogError:"请正确输入自定义路径！！" })
+            return false
+        }
+        if(data.transType==="" || data.transType===undefined){
+            this.setState({ transType: {validated :"error"},dialogError:"请正确选择输出类型！！" })
+            return false
+        }
+
         const request = http.post('/api/v1/stream/add', data)
         request.response((status, headers) => {
-            console.log(status)
             if (status === 200) {
                 request.then((data) => {
                     this.props.addAlert('success', '操作成功')
@@ -478,10 +576,13 @@ class ActivateZoneModal extends React.Component {
                 request.catch((data) => {
                     this.props.addAlert('danger', '操作失败',  data.message)
                 })
+                return false
             }
         })
-        if (event)
+        if (event){          
+            console.log(event)
             event.preventDefault()
+        }
         return false
     }
 
@@ -501,7 +602,7 @@ class ActivateZoneModal extends React.Component {
                 variant='medium'
                 onClose={this.props.close}
                 title={this.state.title}
-                footer={
+                header={
                     <>
                         {this.state.dialogError && (
                             <ModalError
@@ -509,6 +610,10 @@ class ActivateZoneModal extends React.Component {
                                 dialogErrorDetail={this.state.dialogErrorDetail}
                             />
                         )}
+                    </>
+                }
+                footer={
+                    <>
                         <Button
                             variant='primary'
                             onClick={this.save}
@@ -528,6 +633,7 @@ class ActivateZoneModal extends React.Component {
                         className='add-zone-zones'
                         helperText={_('拉流任务数据源地址必须是一个有效的rtsp媒体流地址')}
                         helperTextInvalid='请输入正确的拉流任务数据源地址'
+                        validated={this.state.source.validated}
                     >
                         <Flex direction={{ default: 'column' }}>
                             <FlexItem className='add-zone-zones-firewalld'>
@@ -537,8 +643,7 @@ class ActivateZoneModal extends React.Component {
                                     id='source'
                                     name='source'
                                     aria-describedby='拉流任务数据源地址'
-                                    //  validated={this.state.tcp_error ? "error" : "default"}
-                                    value={this.state.source}
+                                    value={this.state.source.value}
                                     onChange={(value) => this.onChange('source', value)}
                                 />
                             </FlexItem>
@@ -551,8 +656,13 @@ class ActivateZoneModal extends React.Component {
                         className='add-zone-zones'
                         helperText={_('推流类型对应不同的流媒体输出格式')}
                         helperTextInvalid='请选择正确的推流类型'
+                        validated={this.state.transType.validated}
                     >
-                        <FormSelect isRequired value={this.state.transType} onChange={(value) => this.onChange('transType', value)} aria-label="FormSelect Input">
+                        <FormSelect isRequired 
+                        value={this.state.transType.value} 
+                        onChange={(value) => this.onChange('transType', value)} 
+                        aria-label="FormSelect Input"
+                        >
                             {this.options.map((option, index) => (
                                 <FormSelectOption isDisabled={option.disabled} key={index} value={option.value} label={option.label} />
                             ))}
@@ -564,15 +674,16 @@ class ActivateZoneModal extends React.Component {
                         className='add-zone-zones'
                         helperText={_('推流名称')}
                         helperTextInvalid='请输入正确的推流名称'
+                        validated={this.state.name.validated}
                     >
                         <TextInput
-                                    isRequired
-                                    type='text'
-                                    id='name'
-                                    name='name'
-                                    aria-describedby='推流名称'
-                                    value={this.state.name}
-                                    onChange={(value) => this.onChange('name', value)}
+                        isRequired
+                        type='text'
+                        id='name'
+                        name='name'
+                        aria-describedby='推流名称'
+                        value={this.state.name.value}
+                        onChange={(value) => this.onChange('name', value)}
                         />
                     </FormGroup>
                     <FormGroup
@@ -581,24 +692,23 @@ class ActivateZoneModal extends React.Component {
                         className='add-zone-zones'
                         helperText={_('推流路径用来生成输出连接和生成m3u8文件存放目录，例如：/cctv1')}
                         helperTextInvalid='请输入正确的推流路径'
+                        validated={this.state.roomName.validated}
                     >
                         <TextInput
-                                    isRequired
-                                    type='text'
-                                    id='roomName'
-                                    name='roomName'
-                                    aria-describedby='推流路径'
-                                    //  validated={this.state.tcp_error ? "error" : "default"}
-                                    value={this.state.roomName}
-                                    onChange={(value) => this.onChange('roomName', value)}
+                        isRequired
+                        type='text'
+                        id='roomName'
+                        name='roomName'
+                        aria-describedby='推流路径'
+                        value={this.state.roomName.value}
+                        onChange={(value) => this.onChange('roomName', value)}
                         />
                     </FormGroup>
-                    <FormGroup label={_('网口')} isRequired>
+                    <FormGroup label={_('网口')} >
                         <Flex direction={{ default: 'column' }}>
                             <FlexItem className='add-zone-zones-custom'>
                                 <FormSelect
-                                    isRequired
-                                    value={this.state.eth}
+                                    value={this.state.eth.value}
                                     onChange={(value, e) => this.onChange('eth', value)}
                                     aria-label='FormSelect Input'
                                 >

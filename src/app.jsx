@@ -12,11 +12,9 @@ import { ModelContext } from './model-context.jsx'
 import {  init as initDialogs, NetworkManagerModel , device_state_text, is_managed, render_active_connection } from './interfaces.js'
 import { Application } from './iptv.jsx'
 
-import { useObject, useEvent, usePageLocation } from 'hooks'
+import { useObject, useEvent } from 'hooks'
 import { EmptyStatePanel } from 'cockpit-components-empty-state.jsx'
-import { UsageMonitor } from './helpers.js'
 import { superuser } from 'superuser'
-import { PlotState } from 'plot'
 
 const _ = cockpit.gettext
 
@@ -30,7 +28,10 @@ const App = () => {
     })
 
     useEvent(superuser, 'changed')
-
+    
+    const [selectedRepoIds, setselectedRepoIds] = React.useState([])
+    const [shifting, setShifting] = React.useState(false)
+    const [recentSelectedRowIndex, setRecentSelectedRowIndex] = React.useState(null)
 
     if (model.curtain === 'testing' || model.curtain === 'restoring') {
         return (
@@ -61,7 +62,15 @@ const App = () => {
 
     return (
         <ModelContext.Provider value={model}>
-            <Application interfaces={interfaces} />
+            <Application 
+            interfaces={interfaces} 
+            selectedRepoIds ={selectedRepoIds} 
+            setselectedRepoIds={setselectedRepoIds} 
+            shifting={shifting}
+            setShifting={setShifting}
+            recentSelectedRowIndex={recentSelectedRowIndex}
+            setRecentSelectedRowIndex={setRecentSelectedRowIndex}
+            />
         </ModelContext.Provider>
     )
 
