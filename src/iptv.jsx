@@ -126,7 +126,7 @@ export class Application extends React.Component {
         if(!this.props.selectedRepoIds || this.props.selectedRepoIds.length ===0){
             return false
         }
-        const request = http.get('/api/v1/stream/stopAll',{ids:this.props.selectedRepoIds})
+        const request = http.post('/api/v1/stream/stopAll',{ids:this.props.selectedRepoIds})
         request.response((status, headers) => {
             if (status === 200) {
                 this.tasklist()
@@ -145,18 +145,16 @@ export class Application extends React.Component {
         if(!this.props.selectedRepoIds || this.props.selectedRepoIds.length ===0){
             return false
         }
-        const request = http.get('/api/v1/stream/startAll',{ids:this.props.selectedRepoIds})
+        const request = http.post('/api/v1/stream/startAll',{ids:this.props.selectedRepoIds})
         request.response((status, headers) => {
             if (status === 200) {
                 this.tasklist()
                 request.then((data) => {
                     this.addAlert('success', '操作成功')
                 })
-            } else {
-                request.catch((data) => {
-                    this.addAlert('danger', '操作失败', data.message)
-                })
-            }
+            } 
+        }).catch((data) => {
+            this.addAlert('danger', '操作失败', data.message)
         })
     }
 
@@ -329,11 +327,11 @@ export class Application extends React.Component {
                             <SplitItem>
                                 <Button variant='primary' onClick={this.openAddTaskDialog}>
                                     添 加
-                                </Button>
-                                <Button variant='green' onClick={this.startAll}>
+                                </Button>{' '}
+                                <Button variant='warning' onClick={this.startAll.bind(this)}>
                                     启 动
-                                </Button>
-                                <Button variant='danger' onClick={this.stopAll}>
+                                </Button>{' '}
+                                <Button variant='danger' onClick={this.stopAll.bind(this)}>
                                     停 止
                                 </Button>
                             </SplitItem>
@@ -580,7 +578,6 @@ class ActivateZoneModal extends React.Component {
             }
         })
         if (event){          
-            console.log(event)
             event.preventDefault()
         }
         return false
