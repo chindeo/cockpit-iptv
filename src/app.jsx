@@ -19,6 +19,9 @@ import { superuser } from 'superuser'
 const _ = cockpit.gettext
 
 const App = () => {
+
+
+        
     const model = useObject(() => new NetworkManagerModel(), null, [])
     useEvent(model, 'changed')
 
@@ -57,8 +60,6 @@ const App = () => {
     }
 
     const interfaces =  model.list_interfaces()
-
-    console.log(interfaces)
 
     return (
         <ModelContext.Provider value={model}>

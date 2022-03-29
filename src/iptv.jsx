@@ -60,14 +60,14 @@ const http = cockpit.http({
 export class Application extends React.Component {
     constructor(props) {
         super(props)
-    
+        
         this.state = {
             repo:null,
             alerts: [],
             repositories: [],
 
             page: 1,
-            perPage: 10,
+            perPage: 5,
             totalItemCount: 10,
 
             showActivateTaskModalType: "",
@@ -99,17 +99,23 @@ export class Application extends React.Component {
     }
 
     onSetPage(_event, pageNumber) {
+        console.log(pageNumber)
         this.setState({
             page: pageNumber
+        }, ()=> {
+            console.log(this.state.page)
+            this.tasklist()
         })
-        this.tasklist()
+
     }
 
     onPerPageSelect(_event, perPageNumber) {
         this.setState({
             perPage: perPageNumber
+        }, ()=> {
+            console.log(this.state.perPage)
+            this.tasklist()
         })
-        this.tasklist()
     }
 
     addAlert(type, text, detail) {
@@ -244,10 +250,6 @@ export class Application extends React.Component {
             {
                 title: '5',
                 value: 5
-            },
-            {
-                title: '10',
-                value: 10
             }
         ]
 
