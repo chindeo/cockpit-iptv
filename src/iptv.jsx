@@ -585,9 +585,8 @@ class ActivateZoneModal extends React.Component {
 
     render() {
         this.options = [
-            { value: '', label: '请选择', disabled: true },
-            { value: 'RTMP', label: 'RTMP', disabled: false },
             { value: 'HLS', label: 'HLS', disabled: false },
+            { value: 'RTMP', label: 'RTMP', disabled: false },
             { value: 'FLV', label: 'FLV', disabled: false },
         ]
 
@@ -687,7 +686,7 @@ class ActivateZoneModal extends React.Component {
                         isRequired
                         label={_('路径')}
                         className='add-zone-zones'
-                        helperText={_('推流路径用来生成输出连接和生成m3u8文件存放目录，例如：/cctv1')}
+                        helperText={_('推流路径用来生成输出连接和生成m3u8文件存放目录,必须唯一，例如：/cctv1')}
                         helperTextInvalid='请输入正确的推流路径'
                         validated={this.state.roomName.validated}
                     >
@@ -701,7 +700,7 @@ class ActivateZoneModal extends React.Component {
                         onChange={(value) => this.onChange('roomName', value)}
                         />
                     </FormGroup>
-                    <FormGroup label={_('网口')} >
+                    {/* <FormGroup label={_('网口')} >
                         <Flex direction={{ default: 'column' }}>
                             <FlexItem className='add-zone-zones-custom'>
                                 <FormSelect
@@ -720,7 +719,7 @@ class ActivateZoneModal extends React.Component {
                                 </FormSelect>
                             </FlexItem>
                         </Flex>
-                    </FormGroup>
+                    </FormGroup> */}
                 </Form>
             </Modal>
         )
