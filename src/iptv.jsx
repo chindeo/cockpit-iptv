@@ -31,7 +31,7 @@ import {
     FormSelectOption,
     TextArea,
     setTabIndex
-} from '@patternfly/react-core'
+    ,Toolbar, ToolbarContent, ToolbarItem, OptionsMenu, OptionsMenuItemGroup, OptionsMenuItem, OptionsMenuSeparator, OptionsMenuToggle, PageSectionVariants} from '@patternfly/react-core'
 import {
     TableComposable,
     TableText,
@@ -42,6 +42,7 @@ import {
     Td,
     ActionsColumn
 } from '@patternfly/react-table'
+import SortAmountDownIcon from '@patternfly/react-icons/dist/esm/icons/sort-amount-down-icon'
 import { format } from 'date-fns'
 import { ModalError } from 'cockpit-components-inline-notification.jsx'
 
@@ -67,8 +68,8 @@ export class Application extends React.Component {
             repositories: [],
 
             page: 1,
-            perPage: 5,
-            totalItemCount: 10,
+            perPage: 10,
+            totalItemCount: 0,
 
             showActivateTaskModalType: "",
             showActivateTaskModal: false
@@ -103,7 +104,6 @@ export class Application extends React.Component {
         this.setState({
             page: pageNumber
         }, ()=> {
-            console.log(this.state.page)
             this.tasklist()
         })
 
@@ -113,7 +113,6 @@ export class Application extends React.Component {
         this.setState({
             perPage: perPageNumber
         }, ()=> {
-            console.log(this.state.perPage)
             this.tasklist()
         })
     }
@@ -248,8 +247,12 @@ export class Application extends React.Component {
                 value: 1
             },
             {
-                title: '5',
-                value: 5
+                title: '10',
+                value: 10
+            },
+            {
+                title: '20',
+                value: 20
             }
         ]
 
@@ -319,158 +322,196 @@ export class Application extends React.Component {
             this.props.setRecentSelectedRowIndex(rowIndex)
         }
 
+
+
+        const getSortableRowValues = repo => {
+            const {id} = repo
+            return [id]
+        }
+        let sortedRepositories = this.state.repositories
+        if (this.props.activeSortIndex !== null) {
+            sortedRepositories = this.state.repositories.sort((a, b) => {
+                const aValue = getSortableRowValues(a)[this.props.activeSortIndex]
+                const bValue = getSortableRowValues(b)[this.props.activeSortIndex]
+                if (typeof aValue === 'number') {
+                    if (this.props.activeSortDirection === 'asc') {
+                        return aValue - bValue
+                    }
+                    return bValue - aValue
+                } else {
+                    if (this.props.activeSortDirection === 'asc') {
+                        return aValue.localeCompare(bValue)
+                    }
+                    return bValue.localeCompare(aValue)
+                }
+            })
+        }
+        const getSortParams = columnIndex => ({
+            sortBy: {
+                index: this.props.activeSortIndex,
+                direction: this.props.activeSortDirection
+            },
+            onSort: (_event, index, direction) => {
+                this.props.setActiveSortIndex(index)
+                this.props.setActiveSortDirection(direction)
+            },
+            columnIndex
+        })
+
         return (
-            <>
-                <AlertGroup isLiveRegion>{this.state.alerts}</AlertGroup>
-                <Card >
-                    <CardTitle>
-                        <Split>
-                            <SplitItem isFilled>IPTV数据服务</SplitItem>
-                            <SplitItem>
-                                <Button variant='primary' onClick={this.openAddTaskDialog}>
-                                    添 加
-                                </Button>{' '}
-                                <Button variant='warning' onClick={this.startAll.bind(this)}>
-                                    启 动
-                                </Button>{' '}
-                                <Button variant='danger' onClick={this.stopAll.bind(this)}>
-                                    停 止
-                                </Button>
-                            </SplitItem>
-                        </Split>
-                    </CardTitle>
-                    <CardBody>
-                        <TableComposable aria-label='Actions table'>
-                            <Thead>
-                                <Tr>
-                                    <Th select={{
-                                        onSelect: (_event, isSelecting) => selectAllRepos(isSelecting),
-                                        isSelected: areAllReposSelected
-                                    }} />
-                                    <Th width={2}>{columnNames.id}</Th>
-                                    <Th width={5}>{columnNames.name}</Th>
-                                    <Th width={5}>{columnNames.roomName}</Th>
-                                    <Th width={20}>{columnNames.source}</Th>
-                                    <Th width={15}>{columnNames.url}</Th>
-                                    <Th>{columnNames.transType}</Th>
-                                    <Th>{columnNames.status}</Th>
-                                    <Th>{columnNames.eth}</Th>
-                                    <Th>{columnNames.startAt}</Th>
-                                    <Td />
-                                    <Td />
-                                </Tr>
-                            </Thead>
-                            <Tbody>
-                                {this.state.repositories.map((repo,rowIndex) => {
-                                    const rowActions = defaultActions(repo)
-                                    return (
-                                        <Tr key={repo.roomName}>
-                                            <Td select={{
-                                                rowIndex,
-                                                onSelect: (_event, isSelecting) => onSelectRepo(repo, rowIndex, isSelecting),
-                                                isSelected: isRepoSelected(repo),
-                                                disable: !isRepoSelectable(repo)
-                                            }} />
-                                            <Td dataLabel={columnNames.id}>{repo.id}</Td>
-                                            <Td dataLabel={columnNames.name}>
-                                                {repo.name}
-                                            </Td>
-                                            <Td dataLabel={columnNames.roomName}>
-                                                {repo.roomName}
-                                            </Td>
-                                            <Td
+            <Page>
+                <PageSection variant={PageSectionVariants.light} type="nav" className="services-header ct-pagesection-mobile">
+                    <AlertGroup isLiveRegion>{this.state.alerts}</AlertGroup>
+                    <Card >
+                        <CardTitle>
+                            <Split>
+                                <SplitItem isFilled>IPTV数据服务</SplitItem>
+                                <SplitItem>
+                                    <Button variant='primary' onClick={this.openAddTaskDialog}>
+                                        添 加
+                                    </Button>{' '}
+                                    <Button variant='warning' onClick={this.startAll.bind(this)}>
+                                        启 动
+                                    </Button>{' '}
+                                    <Button variant='danger' onClick={this.stopAll.bind(this)}>
+                                        停 止
+                                    </Button>
+                                </SplitItem>
+                            </Split>
+                        </CardTitle>
+                        <CardBody>
+                            <TableComposable aria-label='Actions table'>
+                                <Thead>
+                                    <Tr>
+                                        <Th select={{
+                                            onSelect: (_event, isSelecting) => selectAllRepos(isSelecting),
+                                            isSelected: areAllReposSelected
+                                        }} />
+                                        <Th sort={getSortParams(0)} width={2}>{columnNames.id}</Th>
+                                        <Th width={5}>{columnNames.name}</Th>
+                                        <Th width={5}>{columnNames.roomName}</Th>
+                                        <Th width={20}>{columnNames.source}</Th>
+                                        <Th width={15}>{columnNames.url}</Th>
+                                        <Th>{columnNames.transType}</Th>
+                                        <Th>{columnNames.status}</Th>
+                                        <Th>{columnNames.eth}</Th>
+                                        <Th>{columnNames.startAt}</Th>
+                                        <Td />
+                                        <Td />
+                                    </Tr>
+                                </Thead>
+                                <Tbody>
+                                    {sortedRepositories.map((repo,rowIndex) => {
+                                        const rowActions = defaultActions(repo)
+                                        return (
+                                            <Tr key={repo.roomName}>
+                                                <Td select={{
+                                                    rowIndex,
+                                                    onSelect: (_event, isSelecting) => onSelectRepo(repo, rowIndex, isSelecting),
+                                                    isSelected: isRepoSelected(repo),
+                                                    disable: !isRepoSelectable(repo)
+                                                }} />
+                                                <Td dataLabel={columnNames.id}>{repo.id}</Td>
+                                                <Td dataLabel={columnNames.name}>
+                                                    {repo.name}
+                                                </Td>
+                                                <Td dataLabel={columnNames.roomName}>
+                                                    {repo.roomName}
+                                                </Td>
+                                                <Td
                                                   dataLabel={columnNames.source}
                                                   modifier='breakWord'
-                                            >
-                                                <ClipboardCopy hoverTip="Copy" clickTip="Copied" variant={ClipboardCopyVariant.expansion} >{repo.source}
-                                                </ClipboardCopy>
-                                            </Td>
-                                            <Td
+                                                >
+                                                    <ClipboardCopy hoverTip="Copy" clickTip="Copied" variant={ClipboardCopyVariant.expansion} >{repo.source}
+                                                    </ClipboardCopy>
+                                                </Td>
+                                                <Td
                                                   dataLabel={columnNames.url}
                                                   modifier='breakWord'
-                                            >
-                                                <ClipboardCopy hoverTip="Copy" clickTip="Copied" variant={ClipboardCopyVariant.expansion} >{repo.url}
-                                                </ClipboardCopy>
-                                            </Td>
-                                            <Td textCenter dataLabel={columnNames.transType}>
-                                                {repo.transType}
-                                            </Td>
-                                            <Td dataLabel={columnNames.status}>
-                                                <Label
+                                                >
+                                                    <ClipboardCopy hoverTip="Copy" clickTip="Copied" variant={ClipboardCopyVariant.expansion} >{repo.url}
+                                                    </ClipboardCopy>
+                                                </Td>
+                                                <Td textCenter dataLabel={columnNames.transType}>
+                                                    {repo.transType}
+                                                </Td>
+                                                <Td dataLabel={columnNames.status}>
+                                                    <Label
                                                       color={
                                                           repo.status
                                                               ? 'green'
                                                               : ''
                                                       }
-                                                >
-                                                    {repo.statusText}
-                                                </Label>
-                                            </Td>
-                                            <Td textCenter dataLabel={columnNames.eth}>
-                                                {repo.eth}
-                                            </Td>
-                                            <Td
+                                                    >
+                                                        {repo.statusText}
+                                                    </Label>
+                                                </Td>
+                                                <Td textCenter dataLabel={columnNames.eth}>
+                                                    {repo.eth}
+                                                </Td>
+                                                <Td
                                                   dataLabel={columnNames.startAt}
                                                   modifier='breakWord'
-                                            >
-                                                {repo.startAt !== '-'
-                                                    ? format(
-                                                        new Date(repo.startAt),
-                                                        'yyyy-MM-dd H:m:s'
-                                                    )
-                                                    : repo.startAt}
-                                            </Td>
-                                            <Td
+                                                >
+                                                    {repo.startAt !== '-'
+                                                        ? format(
+                                                            new Date(repo.startAt),
+                                                            'yyyy-MM-dd H:m:s'
+                                                        )
+                                                        : repo.startAt}
+                                                </Td>
+                                                <Td
                                                   dataLabel={columnNames.singleAction}
                                                   modifier='fitContent'
-                                            >
-                                                <TableText>
-                                                    {repo.status ? (
-                                                        <Button
+                                                >
+                                                    <TableText>
+                                                        {repo.status ? (
+                                                            <Button
                                                               variant='danger'
                                                               onClick={this.stopTask.bind(
                                                                   this,
                                                                   repo.id
                                                               )}
-                                                        >
-                                                            停止
-                                                        </Button>
-                                                    ) : (
-                                                        <Button
+                                                            >
+                                                                停止
+                                                            </Button>
+                                                        ) : (
+                                                            <Button
                                                               variant='primary'
                                                               onClick={this.startTask.bind(
                                                                   this,
                                                                   repo.id
                                                               )}
-                                                        >
-                                                            启动
-                                                        </Button>
-                                                    )}
-                                                </TableText>
-                                            </Td>
-                                            <Td isActionCell>
-                                                {rowActions ? (
-                                                    <ActionsColumn
+                                                            >
+                                                                启动
+                                                            </Button>
+                                                        )}
+                                                    </TableText>
+                                                </Td>
+                                                <Td isActionCell>
+                                                    {rowActions ? (
+                                                        <ActionsColumn
                                                           items={rowActions}
                                                           isDisabled={
                                                               repo.status
                                                           }
                                                           actionsToggle={customActionsToggle}
-                                                    />
-                                                ) : null}
-                                            </Td>
-                                        </Tr>
-                                    )
-                                })}
-                            </Tbody>
-                        </TableComposable>
-                    </CardBody>
-                    <CardFooter>{this.renderPagination()}</CardFooter>
-                    {this.state.showActivateTaskModal && (
-                        <ActivateZoneModal http={http} type={this.state.showActivateTaskModalType} interfaces={this.props.interfaces} repo={this.state.repo}  addAlert={this.addAlert} tasklist={this.tasklist} close={this.close} />
-                    )}
-                </Card>
-            </>
+                                                        />
+                                                    ) : null}
+                                                </Td>
+                                            </Tr>
+                                        )
+                                    })}
+                                </Tbody>
+                            </TableComposable>
+                        </CardBody>
+                        <CardFooter>{this.renderPagination()}</CardFooter>
+                        {this.state.showActivateTaskModal && (
+                            <ActivateZoneModal http={http} type={this.state.showActivateTaskModalType} interfaces={this.props.interfaces} repo={this.state.repo}  addAlert={this.addAlert} tasklist={this.tasklist} close={this.close} />
+                        )}
+                    </Card>
+                </PageSection>
+            </Page>
         )
     }
 }
@@ -481,12 +522,12 @@ class ActivateZoneModal extends React.Component {
         super(props)
         if(props.type === "add"){
             this.state = {
-                id: '',
-                name: '',
-                source: '',
-                roomName: '',
-                transType: 'HLS',
-                eth: '',
+                id: {validated:"default",value:0},
+                name: {validated:"default",value:""},
+                source:  {validated:"default",value:""},
+                roomName:  {validated:"default",value:""},
+                transType:  {validated:"default",value:"HLS"},
+                eth:  {validated:"default",value:""},
 
                 parentChoices: props.interfaces,
 
@@ -564,6 +605,8 @@ class ActivateZoneModal extends React.Component {
             return false
         }
 
+        console.log(data)
+
         const request = http.post('/api/v1/stream/add', data)
         request.response((status, headers) => {
             if (status === 200) {
@@ -574,6 +617,7 @@ class ActivateZoneModal extends React.Component {
                 })
             } else {
                 request.catch((data) => {
+                    console.log(data)
                     this.props.addAlert('danger', '操作失败',  data.message)
                 })
                 return false

@@ -36,6 +36,9 @@ const App = () => {
     const [shifting, setShifting] = React.useState(false)
     const [recentSelectedRowIndex, setRecentSelectedRowIndex] = React.useState(null)
 
+    const [activeSortIndex, setActiveSortIndex] = React.useState(null)
+    const [activeSortDirection, setActiveSortDirection] = React.useState(null)
+
     if (model.curtain === 'testing' || model.curtain === 'restoring') {
         return (
             <EmptyStatePanel
@@ -61,6 +64,8 @@ const App = () => {
 
     const interfaces =  model.list_interfaces()
 
+
+
     return (
         <ModelContext.Provider value={model}>
             <Application 
@@ -71,6 +76,10 @@ const App = () => {
             setShifting={setShifting}
             recentSelectedRowIndex={recentSelectedRowIndex}
             setRecentSelectedRowIndex={setRecentSelectedRowIndex}
+            activeSortIndex={activeSortIndex}
+            activeSortDirection={activeSortDirection}
+            setActiveSortIndex={setActiveSortIndex}
+            setActiveSortDirection={setActiveSortDirection}
             />
         </ModelContext.Provider>
     )
