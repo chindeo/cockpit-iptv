@@ -485,7 +485,7 @@ class ActivateZoneModal extends React.Component {
                 name: '',
                 source: '',
                 roomName: '',
-                transType: '',
+                transType: 'HLS',
                 eth: '',
 
                 parentChoices: props.interfaces,
