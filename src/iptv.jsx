@@ -31,7 +31,7 @@ import {
     FormSelectOption,
     TextArea,
     setTabIndex
-    ,Toolbar, ToolbarContent, ToolbarItem, OptionsMenu, OptionsMenuItemGroup, OptionsMenuItem, OptionsMenuSeparator, OptionsMenuToggle, PageSectionVariants} from '@patternfly/react-core'
+    ,Toolbar, ToolbarContent, ToolbarItem, OptionsMenu, OptionsMenuItemGroup, OptionsMenuItem, OptionsMenuSeparator, OptionsMenuToggle, PageSectionVariants, Switch} from '@patternfly/react-core'
 import {
     TableComposable,
     TableText,
@@ -223,6 +223,7 @@ export class Application extends React.Component {
                         // 需要转换json to obj
                             if (data !== '' && data !== null) {
                                 const res = JSON.parse(data)
+                                console.log(res.rows)
                                 this.setState({
                                     repositories: res.rows,
                                     totalItemCount: res.total
@@ -528,6 +529,7 @@ class ActivateZoneModal extends React.Component {
                 roomName:  {validated:"default",value:""},
                 transType:  {validated:"default",value:"HLS"},
                 eth:  {validated:"default",value:""},
+                debug:  {validated:"default",value:false},
 
                 parentChoices: props.interfaces,
 
@@ -545,11 +547,14 @@ class ActivateZoneModal extends React.Component {
                 roomName:  {validated:"default",value:props.repo.roomName},
                 transType:  {validated:"default",value:props.repo.transType},
                 eth:  {validated:"default",value:props.repo.eth},
+                debug:  {validated:"default",value:props.repo.debug},
                 parentChoices: props.interfaces,
 
                 dialogError: null,
                 dialogErrorDetail: null,
                 title:"编辑任务",
+                invalidText: '不能为空',
+                validated: 'default',
             }
         }
         
@@ -580,7 +585,8 @@ class ActivateZoneModal extends React.Component {
             source: this.state.source.value,
             roomName: this.state.roomName.value,
             transType: this.state.transType.value,
-            eth: this.state.eth.value
+            eth: this.state.eth.value,
+            debug: this.state.debug.value,
         }
         if(this.props.type === "edit"){
             if(data.id==="" || data.id===undefined){
@@ -604,8 +610,6 @@ class ActivateZoneModal extends React.Component {
             this.setState({ transType: {validated :"error"},dialogError:"请正确选择输出类型！！" })
             return false
         }
-
-        console.log(data)
 
         const request = http.post('/api/v1/stream/add', data)
         request.response((status, headers) => {
@@ -745,6 +749,19 @@ class ActivateZoneModal extends React.Component {
                         value={this.state.roomName.value}
                         onChange={(value) => this.onChange('roomName', value)}
                         />
+                    </FormGroup>
+                    <FormGroup label={_('调试')} >
+                        <Flex direction={{ default: 'column' }}>
+                            <FlexItem className='add-zone-zones-custom'>
+                                <Switch
+                                    id="simple-switch"
+                                    label="调试开启"
+                                    labelOff="调试关闭"
+                                    isChecked={this.state.debug.value}
+                                    onChange={(value) => this.onChange('debug', value)}
+                                />
+                            </FlexItem>
+                        </Flex>
                     </FormGroup>
                     {/* <FormGroup label={_('网口')} >
                         <Flex direction={{ default: 'column' }}>
