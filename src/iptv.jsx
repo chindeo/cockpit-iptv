@@ -31,7 +31,8 @@ import {
     FormSelectOption,
     TextArea,
     setTabIndex
-    ,Toolbar, ToolbarContent, ToolbarItem, OptionsMenu, OptionsMenuItemGroup, OptionsMenuItem, OptionsMenuSeparator, OptionsMenuToggle, PageSectionVariants, Switch} from '@patternfly/react-core'
+    ,Toolbar,  ToolbarToggleGroup, ToolbarItem, SearchInput, ToolbarContent, OptionsMenuItem, OptionsMenuSeparator, OptionsMenuToggle, PageSectionVariants, Switch} from '@patternfly/react-core'
+import { SearchIcon, ExclamationCircleIcon, FilterIcon } from '@patternfly/react-icons'
 import {
     TableComposable,
     TableText,
@@ -72,8 +73,11 @@ export class Application extends React.Component {
             totalItemCount: 0,
 
             showActivateTaskModalType: "",
-            showActivateTaskModal: false
+            showActivateTaskModal: false,
+
+            query: "",
         }
+        this.onFilter = this.onFilter.bind(this)
         this.onSetPage = this.onSetPage.bind(this)
         this.onPerPageSelect = this.onPerPageSelect.bind(this)
         this.tasklist = this.tasklist.bind(this)
@@ -82,6 +86,14 @@ export class Application extends React.Component {
         this.openAddTaskDialog = this.openAddTaskDialog.bind(this)
         this.openEditTaskDialog = this.openEditTaskDialog.bind(this)
         this.close = this.close.bind(this)
+    }
+
+    onFilter(query, event){
+        this.setState({
+            query: query
+        }, ()=> {
+            this.tasklist()
+        })
     }
 
     close() {
@@ -100,13 +112,11 @@ export class Application extends React.Component {
     }
 
     onSetPage(_event, pageNumber) {
-        console.log(pageNumber)
         this.setState({
             page: pageNumber
         }, ()=> {
             this.tasklist()
         })
-
     }
 
     onPerPageSelect(_event, perPageNumber) {
@@ -214,7 +224,8 @@ export class Application extends React.Component {
     tasklist() {
         const request = http.get('/api/v1/pushers', {
             start: this.state.page,
-            limit: this.state.perPage
+            limit: this.state.perPage,
+            q:this.state.query
         })
         request.response((status, headers) => {
             if (status === 200) {
@@ -362,6 +373,26 @@ export class Application extends React.Component {
         return (
             <Page>
                 <PageSection variant={PageSectionVariants.light} type="nav" className="services-header ct-pagesection-mobile">
+                    <Toolbar 
+                    // data-loading={loadingUnits}
+                        //  clearAllFilters={onClearAllFilters}
+                 className="pf-m-sticky-top ct-compact services-toolbar"
+                 id="services-toolbar">
+                        <ToolbarContent>
+                            <ToolbarToggleGroup toggleIcon={<><span className="pf-c-button__icon pf-m-start"><FilterIcon /></span>{_("Toggle filters")}</>} breakpoint="sm"
+                            variant="filter-group" alignment={{ default: 'alignLeft' }}>
+                                <ToolbarItem variant="search-filter">
+                                    <SearchInput id="services-text-filter"
+                             className="services-text-filter"
+                             placeholder={_("搜索源名称")}
+                             value={this.state.query}
+                             onChange={this.onFilter}
+                             onClear={() => this.onFilter('')} />
+                                </ToolbarItem>
+                            </ToolbarToggleGroup>
+                        </ToolbarContent>
+                    </Toolbar>
+                    
                     <AlertGroup isLiveRegion>{this.state.alerts}</AlertGroup>
                     <Card >
                         <CardTitle>

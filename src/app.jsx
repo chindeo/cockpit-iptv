@@ -20,8 +20,6 @@ const _ = cockpit.gettext
 
 const App = () => {
 
-
-        
     const model = useObject(() => new NetworkManagerModel(), null, [])
     useEvent(model, 'changed')
 
