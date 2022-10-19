@@ -76,8 +76,12 @@ export class Application extends React.Component {
             showActivateTaskModal: false,
 
             query: "",
+            status: -1,
+            enable: -1,
         }
         this.onFilter = this.onFilter.bind(this)
+        this.onFilterStatus = this.onFilterStatus.bind(this)
+        this.onFilterEnable = this.onFilterEnable.bind(this)
         this.onSetPage = this.onSetPage.bind(this)
         this.onPerPageSelect = this.onPerPageSelect.bind(this)
         this.tasklist = this.tasklist.bind(this)
@@ -91,6 +95,22 @@ export class Application extends React.Component {
     onFilter(query, event){
         this.setState({
             query: query
+        }, ()=> {
+            this.tasklist()
+        })
+    }
+
+    onFilterStatus(query, event){
+        this.setState({
+            status: query
+        }, ()=> {
+            this.tasklist()
+        })
+    }
+
+    onFilterEnable(query, event){
+        this.setState({
+            enable: query
         }, ()=> {
             this.tasklist()
         })
@@ -174,8 +194,10 @@ export class Application extends React.Component {
     }
 
     stopTask(id) {
+        console.log("停止拉流")
         const request = http.get('/api/v1/stream/stop/' + id)
         request.response((status, headers) => {
+            console.log(status)
             if (status === 200) {
                 this.tasklist()
                 request.then((data) => {
@@ -190,8 +212,10 @@ export class Application extends React.Component {
     }
 
     startTask(id) {
+        console.log("启动拉流")
         const request = http.get('/api/v1/stream/start/' + id)
         request.response((status, headers) => {
+            console.log(status)
             if (status === 200) {
                 this.tasklist()
                 request.then((data) => {
@@ -225,7 +249,9 @@ export class Application extends React.Component {
         const request = http.get('/api/v1/pushers', {
             start: this.state.page,
             limit: this.state.perPage,
-            q:this.state.query
+            q:this.state.query,
+            status:this.state.status,
+            enable:this.state.enable
         })
         request.response((status, headers) => {
             if (status === 200) {
@@ -291,7 +317,7 @@ export class Application extends React.Component {
             startAt: '启动时间',
             status: '任务状态',
             transType: '输出类型',
-            eth: '网口',
+            enable: '是否可用',
             url: '输出地址'
         }
 
@@ -369,6 +395,16 @@ export class Application extends React.Component {
             },
             columnIndex
         })
+        const options = [
+            { value: '', label: '拉流状态', disabled: false, isPlaceholder: true },
+            { value: '0', label: '未启动', disabled: false, isPlaceholder: false },
+            { value: '1', label: '已启动', disabled: false, isPlaceholder: false },
+        ]
+        const enableOptions = [
+            { value: '', label: '源状态', disabled: false, isPlaceholder: true },
+            { value: '0', label: '不可用', disabled: false, isPlaceholder: false },
+            { value: '1', label: '已可用', disabled: false, isPlaceholder: false },
+        ]
 
         return (
             <Page>
@@ -388,6 +424,28 @@ export class Application extends React.Component {
                              value={this.state.query}
                              onChange={this.onFilter}
                              onClear={() => this.onFilter('')} />
+                                </ToolbarItem>
+                                <ToolbarItem variant="search-filter">
+                                    <FormSelect
+                                      value={this.state.status}
+                                      onChange={this.onFilterStatus}
+                                      aria-label="拉流状态"
+                                    >
+                                        {options.map((option, index) => (
+                                            <FormSelectOption isDisabled={option.disabled} key={index} value={option.value} label={option.label} />
+                                        ))}
+                                    </FormSelect>
+                                </ToolbarItem>
+                                <ToolbarItem variant="search-filter">
+                                    <FormSelect
+                                      value={this.state.enable}
+                                      onChange={this.onFilterEnable}
+                                      aria-label="源状态"
+                                    >
+                                        {enableOptions.map((option, index) => (
+                                            <FormSelectOption isDisabled={option.disabled} key={index} value={option.value} label={option.label} />
+                                        ))}
+                                    </FormSelect>
                                 </ToolbarItem>
                             </ToolbarToggleGroup>
                         </ToolbarContent>
@@ -426,7 +484,7 @@ export class Application extends React.Component {
                                         <Th width={15}>{columnNames.url}</Th>
                                         <Th>{columnNames.transType}</Th>
                                         <Th>{columnNames.status}</Th>
-                                        <Th>{columnNames.eth}</Th>
+                                        <Th>{columnNames.enable}</Th>
                                         <Th>{columnNames.startAt}</Th>
                                         <Td />
                                         <Td />
@@ -478,8 +536,16 @@ export class Application extends React.Component {
                                                         {repo.statusText}
                                                     </Label>
                                                 </Td>
-                                                <Td textCenter dataLabel={columnNames.eth}>
-                                                    {repo.eth}
+                                                <Td textCenter dataLabel={columnNames.enable}>
+                                                    <Label
+                                                      color={
+                                                          repo.enable
+                                                              ? 'green'
+                                                              : ''
+                                                      }
+                                                    >
+                                                        {repo.enable ? '已可用':'不可用'}
+                                                    </Label>
                                                 </Td>
                                                 <Td
                                                   dataLabel={columnNames.startAt}
@@ -559,7 +625,7 @@ class ActivateZoneModal extends React.Component {
                 source:  {validated:"default",value:""},
                 roomName:  {validated:"default",value:""},
                 transType:  {validated:"default",value:"HLS"},
-                eth:  {validated:"default",value:""},
+                enable:  {validated:"default",value:false},
                 debug:  {validated:"default",value:false},
 
                 parentChoices: props.interfaces,
@@ -577,7 +643,7 @@ class ActivateZoneModal extends React.Component {
                 source:  {validated:"default",value:props.repo.source},
                 roomName:  {validated:"default",value:props.repo.roomName},
                 transType:  {validated:"default",value:props.repo.transType},
-                eth:  {validated:"default",value:props.repo.eth},
+                enable:  {validated:"default",value:props.repo.enable},
                 debug:  {validated:"default",value:props.repo.debug},
                 parentChoices: props.interfaces,
 
@@ -616,7 +682,7 @@ class ActivateZoneModal extends React.Component {
             source: this.state.source.value,
             roomName: this.state.roomName.value,
             transType: this.state.transType.value,
-            eth: this.state.eth.value,
+            // enable: this.state.enable.value,
             debug: this.state.debug.value,
         }
         if(this.props.type === "edit"){
@@ -794,26 +860,7 @@ class ActivateZoneModal extends React.Component {
                             </FlexItem>
                         </Flex>
                     </FormGroup>
-                    {/* <FormGroup label={_('网口')} >
-                        <Flex direction={{ default: 'column' }}>
-                            <FlexItem className='add-zone-zones-custom'>
-                                <FormSelect
-                                    value={this.state.eth.value}
-                                    onChange={(value, e) => this.onChange('eth', value)}
-                                    aria-label='FormSelect Input'
-                                >
-                                    {this.state.parentChoices.map((option, index) => (
-                                        <FormSelectOption
-                                            isDisabled={option.disabled}
-                                            key={index}
-                                            value={option.Name}
-                                            label={option.Name}
-                                        />
-                                    ))}
-                                </FormSelect>
-                            </FlexItem>
-                        </Flex>
-                    </FormGroup> */}
+                    
                 </Form>
             </Modal>
         )
