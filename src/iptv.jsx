@@ -311,6 +311,7 @@ export class Application extends React.Component {
     render() {
         const columnNames = {
             id: 'ID',
+            pid: 'pid',
             name: '名称',
             roomName: '路径',
             source: '数据源',
@@ -478,6 +479,7 @@ export class Application extends React.Component {
                                             isSelected: areAllReposSelected
                                         }} />
                                         <Th sort={getSortParams(0)} width={2}>{columnNames.id}</Th>
+                                        <Th width={5}>{columnNames.pid}</Th>
                                         <Th width={5}>{columnNames.name}</Th>
                                         <Th width={5}>{columnNames.roomName}</Th>
                                         <Th width={20}>{columnNames.source}</Th>
@@ -502,6 +504,9 @@ export class Application extends React.Component {
                                                     disable: !isRepoSelectable(repo)
                                                 }} />
                                                 <Td dataLabel={columnNames.id}>{repo.id}</Td>
+                                                <Td dataLabel={columnNames.pid}>
+                                                    {repo.pid}
+                                                </Td>
                                                 <Td dataLabel={columnNames.name}>
                                                     {repo.name}
                                                 </Td>
