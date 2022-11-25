@@ -9,7 +9,7 @@ import './lib/patternfly/patternfly-4-cockpit.scss'
 
 import { ModelContext } from './model-context.jsx'
 
-import {  init as initDialogs, NetworkManagerModel , device_state_text, is_managed, render_active_connection } from './interfaces.js'
+import {  init as initDialogs, NetworkManagerModel } from './interfaces.js'
 import { Application } from './iptv.jsx'
 
 import { useObject, useEvent } from 'hooks'
@@ -61,9 +61,8 @@ const App = () => {
     }
 
     const interfaces =  model.list_interfaces()
-
-
-
+    console.log("interface:")
+    console.log(interfaces)
     return (
         <ModelContext.Provider value={model}>
             <Application 

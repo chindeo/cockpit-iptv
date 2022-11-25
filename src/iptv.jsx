@@ -47,7 +47,6 @@ import SortAmountDownIcon from '@patternfly/react-icons/dist/esm/icons/sort-amou
 import { format } from 'date-fns'
 import { ModalError } from 'cockpit-components-inline-notification.jsx'
 
-
 const _ = cockpit.gettext
 
 const http = cockpit.http({
@@ -260,6 +259,7 @@ export class Application extends React.Component {
                         // 需要转换json to obj
                             if (data !== '' && data !== null) {
                                 const res = JSON.parse(data)
+                                console.log("pushers:")
                                 console.log(res.rows)
                                 this.setState({
                                     repositories: res.rows,
@@ -319,6 +319,7 @@ export class Application extends React.Component {
             status: '任务状态',
             transType: '输出类型',
             enable: '是否可用',
+            eth: '网口(namespace)',
             url: '输出地址'
         }
 
@@ -485,6 +486,7 @@ export class Application extends React.Component {
                                         <Th width={20}>{columnNames.source}</Th>
                                         <Th width={15}>{columnNames.url}</Th>
                                         <Th>{columnNames.transType}</Th>
+                                        <Th>{columnNames.eth}</Th>
                                         <Th>{columnNames.status}</Th>
                                         <Th>{columnNames.enable}</Th>
                                         <Th>{columnNames.startAt}</Th>
@@ -529,6 +531,9 @@ export class Application extends React.Component {
                                                 </Td>
                                                 <Td textCenter dataLabel={columnNames.transType}>
                                                     {repo.transType}
+                                                </Td>
+                                                <Td textCenter dataLabel={columnNames.eth}>
+                                                    {repo.eth}
                                                 </Td>
                                                 <Td dataLabel={columnNames.status}>
                                                     <Label
@@ -630,11 +635,9 @@ class ActivateZoneModal extends React.Component {
                 source:  {validated:"default",value:""},
                 roomName:  {validated:"default",value:""},
                 transType:  {validated:"default",value:"HLS"},
+                eth:  {validated:"default",value:""},
                 enable:  {validated:"default",value:false},
                 debug:  {validated:"default",value:false},
-
-                parentChoices: props.interfaces,
-
                 dialogError: null,
                 dialogErrorDetail: null,
                 title:"添加任务",
@@ -648,10 +651,9 @@ class ActivateZoneModal extends React.Component {
                 source:  {validated:"default",value:props.repo.source},
                 roomName:  {validated:"default",value:props.repo.roomName},
                 transType:  {validated:"default",value:props.repo.transType},
+                eth:  {validated:"default",value:props.repo.eth},
                 enable:  {validated:"default",value:props.repo.enable},
                 debug:  {validated:"default",value:props.repo.debug},
-                parentChoices: props.interfaces,
-
                 dialogError: null,
                 dialogErrorDetail: null,
                 title:"编辑任务",
@@ -689,6 +691,7 @@ class ActivateZoneModal extends React.Component {
             transType: this.state.transType.value,
             // enable: this.state.enable.value,
             debug: this.state.debug.value,
+            eth: this.state.eth.value,
         }
         if(this.props.type === "edit"){
             if(data.id==="" || data.id===undefined){
@@ -710,6 +713,10 @@ class ActivateZoneModal extends React.Component {
         }
         if(data.transType==="" || data.transType===undefined){
             this.setState({ transType: {validated :"error"},dialogError:"请正确选择输出类型！！" })
+            return false
+        }
+        if(data.eth==="" || data.eth===undefined){
+            this.setState({ eth: {validated :"error"},dialogError:"请正确选择网口！！" })
             return false
         }
 
@@ -741,6 +748,11 @@ class ActivateZoneModal extends React.Component {
             { value: 'RTMP', label: 'RTMP', disabled: false },
             { value: 'FLV', label: 'FLV', disabled: false },
         ]
+        this.ethChoices = [
+            { value: '', label: '拉流网口', disabled: false, isPlaceholder: true },
+            { value: 'fd', label: 'enp3s0', disabled: false, isPlaceholder: false },
+        ]
+
 
         return (
             <Modal
@@ -813,6 +825,24 @@ class ActivateZoneModal extends React.Component {
                         >
                             {this.options.map((option, index) => (
                                 <FormSelectOption isDisabled={option.disabled} key={index} value={option.value} label={option.label} />
+                            ))}
+                        </FormSelect>
+                    </FormGroup>
+                    <FormGroup
+                        isRequired
+                        label={_('网口')}
+                        className='add-zone-zones'
+                        helperText={_('指定拉流网口')}
+                        helperTextInvalid='请选择正确的拉流网口'
+                        validated={this.state.eth.validated}
+                    >
+                        <FormSelect isRequired 
+                        value={this.state.eth.value} 
+                        onChange={(value) => this.onChange('eth', value)} 
+                        aria-label="FormSelect Input"
+                        >
+                            {this.ethChoices.map((option, index) => (
+                                <FormSelectOption  isDisabled={option.disabled} key={index} value={option.value} label={option.label} />
                             ))}
                         </FormSelect>
                     </FormGroup>
