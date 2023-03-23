@@ -1,0 +1,16 @@
+Source: cockpit-iptv
+Section: web
+Priority: optional
+Maintainer: snowlyg <569616226@qq.com>
+Build-Depends: debhelper (>= 10),make,gettext
+Standards-Version: 0.0.1
+Homepage: https://www.snowlyg.com
+Vcs-Git: https://github.com/chindeo/cockpit-iptv.git
+Vcs-Browser: https://github.com/chindeo/cockpit-iptv.git 
+
+Package: cockpit-iptv
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Cockpit plugin for iptv
+ Cockpit plugin for iptv
+
