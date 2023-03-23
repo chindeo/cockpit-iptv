@@ -46,7 +46,7 @@ if (production) {
 
 module.exports = {
     output: {
-        path: path.resolve(__dirname, '../starter-kit')
+        path: path.resolve(__dirname, '../cockpit-iptv')
     },
     mode: production ? 'production' : 'development',
     resolve: {

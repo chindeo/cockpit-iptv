@@ -1,6 +1,6 @@
 # extract name from package.json
 PACKAGE_NAME := $(shell awk '/"name":/ {gsub(/[",]/, "", $$2); print $$2}' package.json)
-RPM_NAME := cockpit-$(PACKAGE_NAME)
+RPM_NAME := $(PACKAGE_NAME)
 VERSION := $(shell T=$$(git describe 2>/dev/null) || T=1; echo $$T | tr '-' '.')
 ifeq ($(TEST_OS),)
 TEST_OS = centos-8-stream
@@ -12,8 +12,8 @@ SPEC=$(RPM_NAME).spec
 VM_IMAGE=$(CURDIR)/test/images/$(TEST_OS)
 # stamp file to check if/when npm install ran
 NODE_MODULES_TEST=package-lock.json
-# one example file in ../starter-kit/ from webpack to check if that already ran
-WEBPACK_TEST=../starter-kit/manifest.json
+# one example file in ../$(PACKAGE_NAME)/ from webpack to check if that already ran
+WEBPACK_TEST=../$(PACKAGE_NAME)/manifest.json
 # one example file in src/lib to check if it was already checked out
 LIB_TEST=src/lib/cockpit-po-plugin.js
 
@@ -50,7 +50,7 @@ update-po: po/$(PACKAGE_NAME).pot
 	done
 
 #
-# Build/Install/../starter-kit
+# Build/Install/../$(PACKAGE_NAME)
 #
 
 %.spec: packaging/%.spec.in
@@ -63,19 +63,19 @@ watch:
 	NODE_ENV=$(NODE_ENV) node_modules/.bin/webpack --watch
 
 clean:
-	rm -rf ../starter-kit/
+	rm -rf ../$(PACKAGE_NAME)/
 	rm -f $(SPEC)
 
 install: $(WEBPACK_TEST)
 	mkdir -p $(DESTDIR)/usr/share/cockpit/$(PACKAGE_NAME)
-	cp -r ../starter-kit/* $(DESTDIR)/usr/share/cockpit/$(PACKAGE_NAME)
+	cp -r ../$(PACKAGE_NAME)/* $(DESTDIR)/usr/share/cockpit/$(PACKAGE_NAME)
 	mkdir -p $(DESTDIR)/usr/share/metainfo/
 	cp org.cockpit-project.$(PACKAGE_NAME).metainfo.xml $(DESTDIR)/usr/share/metainfo/
 
 # this requires a built source tree and avoids having to install anything system-wide
 devel-install: $(WEBPACK_TEST)
 	mkdir -p ~/.local/share/cockpit
-	ln -s `pwd`/../starter-kit ~/.local/share/cockpit/$(PACKAGE_NAME)
+	ln -s `pwd`/../$(PACKAGE_NAME) ~/.local/share/cockpit/$(PACKAGE_NAME)
 
 print-version:
 	@echo "$(VERSION)"
@@ -91,10 +91,10 @@ $(TARFILE): export NODE_ENV=production
 $(TARFILE): $(WEBPACK_TEST) $(SPEC)
 	if type appstream-util >/dev/null 2>&1; then appstream-util validate-relax --nonet *.metainfo.xml; fi
 	touch -r package.json $(NODE_MODULES_TEST)
-	touch ../starter-kit/*
+	touch ../$(PACKAGE_NAME)/*
 	tar --xz -cf $(TARFILE) --transform 's,^,$(RPM_NAME)/,' \
 		--exclude packaging/$(SPEC).in --exclude node_modules \
-		$$(git ls-files) src/lib package-lock.json $(SPEC) ../starter-kit/
+		$$(git ls-files) src/lib package-lock.json $(SPEC) ../$(PACKAGE_NAME)/
 
 $(NODE_CACHE): $(NODE_MODULES_TEST)
 	tar --xz -cf $@ node_modules

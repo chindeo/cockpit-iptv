@@ -1,0 +1,39 @@
+ dpkg-buildpackage -rfakeroot -us -uc -ui -S
+dpkg-buildpackage: warning: using a gain-root-command while being root
+dpkg-buildpackage: info: source package cockpit-iptv
+dpkg-buildpackage: info: source version 0.0.1
+dpkg-buildpackage: info: source distribution bionic
+dpkg-buildpackage: info: source changed by snowlyg <569616226@qq.com>
+ dpkg-source --before-build package
+ fakeroot debian/rules clean
+dh clean
+   dh_auto_clean
+   dh_clean
+ dpkg-source -b package
+dpkg-source: info: using source format '3.0 (native)'
+dpkg-source: info: building cockpit-iptv in cockpit-iptv_0.0.1.tar.xz
+dpkg-source: info: building cockpit-iptv in cockpit-iptv_0.0.1.dsc
+ dpkg-genbuildinfo --build=source
+ dpkg-genchanges --build=source >../cockpit-iptv_0.0.1_source.changes
+dpkg-genchanges: info: including full source code in upload
+ dpkg-source --after-build package
+dpkg-buildpackage: info: source-only upload: Debian-native package
+Now running lintian cockpit-iptv_0.0.1_source.changes ...
+warning: the authors of lintian do not recommend running it with root privileges!
+E: cockpit-iptv source: source-is-missing cockpit-iptv/index.js line length is 1121 characters (>512)
+E: cockpit-iptv source: readme-source-is-dh_make-template
+E: cockpit-iptv source: build-depends-on-build-essential-package-without-using-version make [build-depends: make]
+E: cockpit-iptv source: debian-rules-is-dh_make-template
+E: cockpit-iptv source: invalid-standards-version 0.0.1
+Finished running lintian.
+Now signing changes and any dsc files...
+ signfile dsc cockpit-iptv_0.0.1.dsc snowlyg <569616226@qq.com>
+
+ fixup_buildinfo cockpit-iptv_0.0.1.dsc cockpit-iptv_0.0.1_source.buildinfo
+ signfile buildinfo cockpit-iptv_0.0.1_source.buildinfo snowlyg <569616226@qq.com>
+
+ fixup_changes dsc cockpit-iptv_0.0.1.dsc cockpit-iptv_0.0.1_source.changes
+ fixup_changes buildinfo cockpit-iptv_0.0.1_source.buildinfo cockpit-iptv_0.0.1_source.changes
+ signfile changes cockpit-iptv_0.0.1_source.changes snowlyg <569616226@qq.com>
+
+Successfully signed dsc, buildinfo, changes files

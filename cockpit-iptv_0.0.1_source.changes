@@ -1,0 +1,46 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+Format: 1.8
+Date: Tue, 23 Mar 2023 01:43:15 +0000
+Source: cockpit-iptv
+Binary: cockpit-iptv
+Architecture: source
+Version: 0.0.1
+Distribution: bionic
+Urgency: medium
+Maintainer: snowlyg <569616226@qq.com>
+Changed-By: snowlyg <569616226@qq.com>
+Description:
+ cockpit-iptv - Cockpit plugin for iptv
+Changes:
+ cockpit-iptv (0.0.1) bionic; urgency=medium
+ .
+   * Initial Release.
+Checksums-Sha1:
+ b56b5c9f51aa29e4f726aa978a9387b5f695bf81 1421 cockpit-iptv_0.0.1.dsc
+ 9dfd567b06f50af4fec9ab4f8e2545ee5fda4eca 732676 cockpit-iptv_0.0.1.tar.xz
+ fec242e53b6b1d66528ceccd10af0ee297556a72 6044 cockpit-iptv_0.0.1_source.buildinfo
+Checksums-Sha256:
+ f82c694a82da411219b58681c72809dd4fa6e507e3be8ea39970e7f5841e486a 1421 cockpit-iptv_0.0.1.dsc
+ 41afb6e99753caeadadd179772bb44b7ab96ae916c4d5a3e17dca205cd9c089e 732676 cockpit-iptv_0.0.1.tar.xz
+ 48ec2f0a58b4ec7d4ab44ba459fcc60569048217efb7d8a4161d014f1d4b4f29 6044 cockpit-iptv_0.0.1_source.buildinfo
+Files:
+ 6d2ecb6ea0c6ba81a475ea339363fdbe 1421 web optional cockpit-iptv_0.0.1.dsc
+ 5aa839b24da1b7b993adc990d1430921 732676 web optional cockpit-iptv_0.0.1.tar.xz
+ 6ac17df5565190788d84745eb92d6b02 6044 web optional cockpit-iptv_0.0.1_source.buildinfo
+
+-----BEGIN PGP SIGNATURE-----
+
+iQHFBAEBCgAvFiEEhIQLzAdKiokA+e/yF1xnlUURo4MFAmQbwusRHDU2OTYxNjIy
+NkBxcS5jb20ACgkQF1xnlUURo4PxKQv9GBy3cOvbC1esPvuc5HJsT7KAURB1zanh
+irjgFu6ns0R9RAR0hXzt1y1mSFesTzSFQwCeHTOHNhBUviNYVamEr6/kS4+Cdphh
+rqSd9yGPIbiidPV4wDbGsLPe2+3lf0Sy9FlzJ4dh+ZmzmPfUVP4ruQqC2cK4HDuv
+YKW7cSGb46QDwd7ueXYKfP5u4w1K+wYzgb9SDDBpz9n3O83x8EKa7KzjMHl+tHEG
+0v/CKM8mncboz5z7ps7IHdSZnPX+0tbuw+jDnKLtpngQluEJUgiTqM77RbtY7+P3
+tc6vKEkAsV5TbbV4Pid6AO6GUf5GwZ5F9pOxUJ4XLTaydVqBjR5ynaaByoLwf7+K
+FjtWSXUJFvOXzD2f3tLdhcBlMGgiajrqF2RCIA0uEpuNTNY9Mp5eyueKkL8TJr3d
+nUKrsp+/6OTej/CK71/fEFtv2B4eo8JxKJB/HJSlyoWO9yq7u9JnEad7npZ3Mgv4
++/XjRCwirJjxg0G9kGCHMP5runEfddfg
+=bSG2
+-----END PGP SIGNATURE-----

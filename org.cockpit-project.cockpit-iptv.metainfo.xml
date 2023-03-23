@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="addon">
-  <id>org.cockpit_project.starter_kit</id>
+  <id>org.cockpit_project.iptv</id>
   <metadata_license>CC0-1.0</metadata_license>
-  <name>Starter Kit</name>
-  <summary>Scaffolding for a cockpit module</summary>
+  <name>Iptv</name>
+  <summary>Iptv for a cockpit module</summary>
   <description>
     <p>
-      Scaffolding for a cockpit module.
+      Iptv for a cockpit module.
     </p>
   </description>
   <extends>org.cockpit_project.cockpit</extends>
-  <launchable type="cockpit-manifest">starter-kit</launchable>
+  <launchable type="cockpit-manifest">iptv</launchable>
 </component>
