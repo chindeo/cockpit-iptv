@@ -7,14 +7,14 @@ Binary: cockpit-iptv
 Architecture: source
 Version: 0.0.1
 Checksums-Md5:
- 6d2ecb6ea0c6ba81a475ea339363fdbe 1421 cockpit-iptv_0.0.1.dsc
+ 56225c14423dfc358d9b27cabf2165b3 1421 cockpit-iptv_0.0.1.dsc
 Checksums-Sha1:
- b56b5c9f51aa29e4f726aa978a9387b5f695bf81 1421 cockpit-iptv_0.0.1.dsc
+ 67b2f6e6e82aa256826240368905b425371646b1 1421 cockpit-iptv_0.0.1.dsc
 Checksums-Sha256:
- f82c694a82da411219b58681c72809dd4fa6e507e3be8ea39970e7f5841e486a 1421 cockpit-iptv_0.0.1.dsc
+ 417c69259c8eb5ad2b105132c60701215647608c25fd074dbf50466717edb46c 1421 cockpit-iptv_0.0.1.dsc
 Build-Origin: Ubuntu
 Build-Architecture: amd64
-Build-Date: Thu, 23 Mar 2023 03:09:23 +0000
+Build-Date: Mon, 17 Apr 2023 03:45:05 +0000
 Installed-Build-Depends:
  autoconf (= 2.69-11),
  automake (= 1:1.15.1-3ubuntu2),
@@ -138,7 +138,7 @@ Installed-Build-Depends:
  libuuid1 (= 2.31.1-0.4ubuntu3.7),
  libxml2 (= 2.9.4+dfsg1-6.1ubuntu1.8),
  libzstd1 (= 1.3.3+dfsg-2ubuntu1.2),
- linux-libc-dev (= 4.15.0-206.217),
+ linux-libc-dev (= 4.15.0-208.220),
  login (= 1:4.5-1ubuntu2.5),
  m4 (= 1.4.18-1),
  make (= 4.1-9.1ubuntu1),
@@ -165,15 +165,15 @@ Environment:
 
 -----BEGIN PGP SIGNATURE-----
 
-iQHFBAEBCgAvFiEEhIQLzAdKiokA+e/yF1xnlUURo4MFAmQbwuoRHDU2OTYxNjIy
-NkBxcS5jb20ACgkQF1xnlUURo4MhYwwAhn09+zKqWO9XCksCQyQ8q2VruYoRR6Nz
-tEkbMFzNEY3DGJDfH6zwU4Ipo+hkPJ4Y3w9k/oatN8tD7uzBp44EVS4WPHogggbF
-c7w2mFixLUx1bxIBWzVk9RnNsUlgWEDSz9VADOV/h25sB0zt5qq+YA1+YxNhQoEe
-INoUiC1fUUEeW/GExjV2BVET08qpgxmHP5TbAUpBbfs8x64VhI8MJrgmXQUMnB2w
-/23ES4RnHjcdEKS6+ZvEBO0a9dWLeygSJ48T53HJPhn/vinb1Ti4d6NgCAPPzxrH
-P/s4dCYrsqoaquifl5/uMqEfi4wT7h5QhkKm0hussNJoSli3k3LQj8foFhlOWzC2
-y19aEvZyhpjcgbLlpSyztT/a/TlTT9NSE3+Kgo99rST+brmkeQc8J1mOjNIg3DPU
-o1+7Bo4NgotmO9E4bDANoL4qKKwJeHB2Ylm9fCsCcCjkKd+XZnz2MvloiNzInv2Q
-vasIJWyByUA+JZ+zcHz7Unyoa2c6NdpK
-=xOF1
+iQHFBAEBCgAvFiEEhIQLzAdKiokA+e/yF1xnlUURo4MFAmQ8wM8RHDU2OTYxNjIy
+NkBxcS5jb20ACgkQF1xnlUURo4Nm+Qv/XF5nFLHRXdoq4PE8ovGyuL1LDgLOPIGN
+fXAGt/7f3/mP6K147/qQ7EVG3q2GdU+Ufz9D3Sg2zjfPHwdNGQbxmAnCNJaxemQN
+Z9ZZp2nsqCxvJUmXijEQjy3UQu6hGUbgB+w/zZTMBkoLEZzHz+VUVMctn5XkcNCP
+NwTOatji2LoAB939uAAK8BQ90RGOQbLsjhgU2EtpOidPoNtyMAGoWioIzbYST5Cq
+SaqMOZJLatPc09r1ZiDME32wqRKm+ymszJ21y1okBIlFMu+ihhhx/do0NqLOeFIC
+vRQDJC80UJK5XvnioiHfSt9uscu8qiqoX/IGZ12TlEYW5kQnYLuCsobcehdcRCOl
+QLFko4h4o9iafrhlB6MokWBOaMnj3vTF4xmb1uPmcI5u/7RwT0cdvwhdiS1Sk0MW
+8xEDGcl1hDphoywG1I6zMozE8ynU1hUKeaGrf1JBQl2AxvQvtX1eWSfOGHTrvAzk
+91zQR/0tdETErHolCWGqDmE5COrGSF3H
+=+N0a
 -----END PGP SIGNATURE-----
